@@ -319,6 +319,106 @@
       margin: 28px 0 12px;
     }
 
+    /* ─── BELL NOTIFICATION ─────────────────────────────── */
+    .bell-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+    .bell-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      padding: 6px;
+      border-radius: 6px;
+      line-height: 1;
+      position: relative;
+    }
+    .bell-btn:hover { background: #f0f0f0; }
+    .bell-dot {
+      position: absolute;
+      top: 4px; right: 4px;
+      width: 9px; height: 9px;
+      background: #D0021B;
+      border-radius: 50%;
+      border: 2px solid #fff;
+    }
+    .notif-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 360px;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+      z-index: 500;
+      overflow: hidden;
+    }
+    .notif-dropdown.open { display: block; animation: dropIn 0.15s ease; }
+    @keyframes dropIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .notif-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .notif-header-title { font-size: 14px; font-weight: 700; color: #1a1a1a; }
+    .notif-header-mark { font-size: 12px; color: #0077C5; cursor: pointer; font-weight: 600; }
+    .notif-header-mark:hover { text-decoration: underline; }
+    .notif-item {
+      display: flex;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid #f8f8f8;
+      background: #FFFBF0;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .notif-item:hover { background: #FFF3D6; }
+    .notif-item.read { background: #fff; }
+    .notif-item.read:hover { background: #fafafa; }
+    .notif-unread-dot {
+      width: 8px; height: 8px;
+      background: #D0021B;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 5px;
+    }
+    .notif-item.read .notif-unread-dot { background: transparent; }
+    .notif-item-body { flex: 1; }
+    .notif-item-title { font-size: 13px; font-weight: 700; color: #1a1a1a; margin-bottom: 3px; }
+    .notif-item-text  { font-size: 12px; color: #555; line-height: 1.4; margin-bottom: 6px; }
+    .notif-item-time  { font-size: 11px; color: #aaa; }
+    .notif-item-actions { display: flex; gap: 8px; margin-top: 8px; }
+    .notif-btn-primary {
+      background: #D0021B; color: #fff;
+      border: none; padding: 6px 14px;
+      border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+    .notif-btn-primary:hover { background: #a30014; }
+    .notif-btn-secondary {
+      background: transparent; color: #0077C5;
+      border: 1.5px solid #0077C5; padding: 5px 12px;
+      border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+    .notif-btn-secondary:hover { background: #e8f4fb; }
+    .notif-footer {
+      padding: 10px 16px;
+      text-align: center;
+      font-size: 12px;
+      color: #0077C5;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .notif-footer:hover { text-decoration: underline; }
+
     /* ─── SCREEN SEPARATOR ──────────────────────────────── */
     .screen-separator {
       text-align: center;
@@ -723,15 +823,57 @@
 <div class="screen-separator">&#x2014;&#x2014;&#x2014; Screen 2 &#x2014;&#x2014;&#x2014;</div>
 
 <div class="proto-label">
-  <strong>Screen 2 — OINP Post-Restriction Message</strong>
-  Triggered after account is deactivated/restricted by CC or Telegram policy — replaces generic decline message
+  <strong>Screen 2 — OINP Post-Restriction Message (Bell Notification Flow)</strong>
+  Bell icon in nav shows unread alert · Click bell to expand dropdown · CTAs lead to password update or passkey setup
 </div>
 
 <div class="browser">
-  <!-- Top Nav -->
+  <!-- Top Nav with Bell -->
   <div class="top-nav">
     <div class="intuit-logo">intuit</div>
-    <div class="search-icon">&#9906;</div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div class="search-icon">&#9906;</div>
+      <!-- Bell notification -->
+      <div class="bell-wrap" id="bell-wrap-s2">
+        <button class="bell-btn" onclick="toggleBell()" title="Notifications">
+          🔔
+          <span class="bell-dot" id="bell-dot-s2"></span>
+        </button>
+        <!-- Dropdown -->
+        <div class="notif-dropdown" id="notif-dropdown-s2">
+          <div class="notif-header">
+            <span class="notif-header-title">Notifications</span>
+            <span class="notif-header-mark" onclick="markRead()">Mark all as read</span>
+          </div>
+
+          <!-- Unread critical alert -->
+          <div class="notif-item" id="notif-item-main">
+            <div class="notif-unread-dot" id="notif-unread-dot"></div>
+            <div class="notif-item-body">
+              <div class="notif-item-title">🚨 Your account has been restricted</div>
+              <div class="notif-item-text">Your sign-in credentials were found on the dark web. We've temporarily restricted your account to keep it safe. Update your password to restore access.</div>
+              <div class="notif-item-time">Just now · Intuit Security</div>
+              <div class="notif-item-actions">
+                <button class="notif-btn-primary" onclick="closeBell(); openModal('modal-password')">Update password</button>
+                <button class="notif-btn-secondary" onclick="closeBell(); openModal('modal-passkey')">Set up passkey</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Older read notification -->
+          <div class="notif-item read">
+            <div class="notif-unread-dot"></div>
+            <div class="notif-item-body">
+              <div class="notif-item-title">Two-step verification reminder</div>
+              <div class="notif-item-text">Strengthen your account security by setting up an authenticator app.</div>
+              <div class="notif-item-time">2 days ago · Intuit Security</div>
+            </div>
+          </div>
+
+          <div class="notif-footer">View all notifications</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="page-layout">
@@ -754,15 +896,13 @@
         <p>Update the way you sign in to your Intuit products.</p>
       </div>
 
-      <!-- CRITICAL / POST-RESTRICTION OINP BANNER -->
-      <div class="banner-critical">
+      <!-- OINP via bell — subtle inline restricted state -->
+      <div class="banner-critical" style="background:#FEF0F0; border-color:#D0021B;">
         <div class="banner-icon">🚨</div>
         <div class="banner-body">
-          <div class="banner-title">Your account has been restricted due to compromised credentials</div>
+          <div class="banner-title">Action required — check your notifications</div>
           <div class="banner-text">
-            We found your Intuit sign-in credentials circulating on the dark web as part of a third-party data breach.
-            To protect you, we've temporarily restricted access to your account.
-            Update your password to restore full access — this takes less than 2 minutes.
+            Your account has been restricted. Click the 🔔 bell icon in the top right to view details and restore access.
           </div>
           <div class="banner-actions">
             <button class="btn-danger" onclick="openModal('modal-password')">Update password to restore access</button>
@@ -852,6 +992,23 @@
     closeModal(closeId);
     openModal(successId);
   }
+  function toggleBell() {
+    const dd = document.getElementById('notif-dropdown-s2');
+    dd.classList.toggle('open');
+  }
+  function closeBell() {
+    document.getElementById('notif-dropdown-s2').classList.remove('open');
+  }
+  function markRead() {
+    document.getElementById('bell-dot-s2').style.display = 'none';
+    document.getElementById('notif-unread-dot').style.background = 'transparent';
+    document.getElementById('notif-item-main').classList.add('read');
+  }
+  // Close bell dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    const wrap = document.getElementById('bell-wrap-s2');
+    if (wrap && !wrap.contains(e.target)) closeBell();
+  });
   function dismissBanner() {
     document.querySelectorAll('.banner-warning').forEach(b => b.style.display = 'none');
   }
