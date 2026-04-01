@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Intuit Security Center — Dark Net Comms Prototypes</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'AvenirNext', 'Avenir Next', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f4f4f6;
+      color: #2d2d2d;
+    }
+
+    /* ─── PROTOTYPE LABELS ─────────────────────────────── */
+    .proto-label {
+      background: #393a3d;
+      color: #fff;
+      text-align: center;
+      padding: 12px 24px;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+    }
+    .proto-label strong { font-size: 15px; display: block; margin-bottom: 2px; }
+
+    /* ─── BROWSER CHROME ───────────────────────────────── */
+    .browser {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 24px auto;
+      max-width: 1280px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    /* ─── INTUIT TOP NAV ───────────────────────────────── */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      height: 52px;
+      border-bottom: 1px solid #e5e5e5;
+      background: #fff;
+    }
+    .intuit-logo {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0077C5;
+      letter-spacing: -0.5px;
+    }
+    .intuit-logo span { color: #2ca01c; }
+    .search-icon { color: #6b6b6b; font-size: 18px; cursor: pointer; }
+
+    /* ─── LAYOUT ───────────────────────────────────────── */
+    .page-layout {
+      display: flex;
+      min-height: calc(100vh - 52px);
+    }
+
+    /* ─── SIDEBAR ──────────────────────────────────────── */
+    .sidebar {
+      width: 200px;
+      flex-shrink: 0;
+      background: #fff;
+      border-right: 1px solid #e5e5e5;
+      padding-top: 8px;
+    }
+    .sidebar-item {
+      display: block;
+      padding: 11px 20px;
+      font-size: 14px;
+      color: #3d3d3d;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      text-decoration: none;
+    }
+    .sidebar-item:hover { background: #f5f5f5; }
+    .sidebar-item.active {
+      background: #e8f4fb;
+      border-left-color: #0077C5;
+      color: #0077C5;
+      font-weight: 600;
+    }
+
+    /* ─── MAIN CONTENT ─────────────────────────────────── */
+    .main-content {
+      flex: 1;
+      padding: 0 40px 60px;
+      background: #fafafa;
+    }
+
+    /* ─── PAGE HEADER ──────────────────────────────────── */
+    .page-header {
+      text-align: center;
+      padding: 36px 0 28px;
+    }
+    .page-header .lock-icon {
+      font-size: 40px;
+      display: block;
+      margin-bottom: 10px;
+      color: #555;
+    }
+    .page-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #2d2d2d;
+      margin-bottom: 6px;
+    }
+    .page-header p {
+      font-size: 15px;
+      color: #6b6b6b;
+    }
+
+    /* ─── CARD ─────────────────────────────────────────── */
+    .card {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 24px 28px;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #2d2d2d;
+      margin-bottom: 4px;
+    }
+    .card-subtitle {
+      font-size: 13px;
+      color: #6b6b6b;
+      margin-bottom: 20px;
+    }
+    .card-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-top: 1px solid #f0f0f0;
+    }
+    .card-row:first-of-type { border-top: none; }
+    .card-row-label { font-size: 14px; color: #4a4a4a; font-weight: 500; }
+    .card-row-value { font-size: 14px; color: #6b6b6b; }
+    .card-row-action {
+      font-size: 13px;
+      color: #0077C5;
+      cursor: pointer;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .card-row-action:hover { text-decoration: underline; }
+
+    /* ─── BANNER: WARNING (proactive) ──────────────────── */
+    .banner-warning {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: #FFF8E7;
+      border: 1.5px solid #F5A623;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+    }
+    .banner-warning .banner-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+    .banner-warning .banner-body { flex: 1; }
+    .banner-warning .banner-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #8a5000;
+      margin-bottom: 4px;
+    }
+    .banner-warning .banner-text {
+      font-size: 13.5px;
+      color: #6b4000;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .banner-warning .banner-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: #0077C5;
+      color: #fff;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 5px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-primary:hover { background: #005fa3; }
+    .btn-secondary {
+      background: transparent;
+      color: #0077C5;
+      border: 1.5px solid #0077C5;
+      padding: 7px 16px;
+      border-radius: 5px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-secondary:hover { background: #e8f4fb; }
+    .btn-dismiss {
+      background: none;
+      border: none;
+      color: #8a5000;
+      font-size: 12px;
+      cursor: pointer;
+      text-decoration: underline;
+      margin-left: 4px;
+    }
+    .banner-close {
+      flex-shrink: 0;
+      background: none;
+      border: none;
+      font-size: 18px;
+      color: #aaa;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+    }
+
+    /* ─── BANNER: CRITICAL (post-restriction OINP) ──────── */
+    .banner-critical {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: #FEF0F0;
+      border: 1.5px solid #D0021B;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+    }
+    .banner-critical .banner-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+    .banner-critical .banner-body { flex: 1; }
+    .banner-critical .banner-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #a30014;
+      margin-bottom: 4px;
+    }
+    .banner-critical .banner-text {
+      font-size: 13.5px;
+      color: #7a000f;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .banner-critical .banner-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .btn-danger {
+      background: #D0021B;
+      color: #fff;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 5px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-danger:hover { background: #a30014; }
+
+    /* ─── PASSKEY PROMO CARD ────────────────────────────── */
+    .passkey-promo {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: #EAF5FF;
+      border: 1px solid #b3d9f5;
+      border-radius: 8px;
+      padding: 14px 20px;
+      margin-top: 12px;
+    }
+    .passkey-promo .passkey-icon { font-size: 26px; flex-shrink: 0; }
+    .passkey-promo .passkey-body { flex: 1; }
+    .passkey-promo .passkey-title { font-size: 14px; font-weight: 700; color: #004a7c; margin-bottom: 2px; }
+    .passkey-promo .passkey-text { font-size: 13px; color: #2a6496; line-height: 1.4; }
+    .passkey-promo .passkey-cta {
+      font-size: 13px;
+      color: #0077C5;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    .passkey-promo .passkey-cta:hover { text-decoration: underline; }
+
+    /* ─── STATUS BADGE ──────────────────────────────────── */
+    .badge-restricted {
+      display: inline-block;
+      background: #fde8ea;
+      color: #a30014;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+      letter-spacing: 0.3px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    .badge-action-needed {
+      display: inline-block;
+      background: #fff3d6;
+      color: #8a5000;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+      letter-spacing: 0.3px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    /* ─── DIVIDER ───────────────────────────────────────── */
+    .section-divider {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #999;
+      text-transform: uppercase;
+      margin: 28px 0 12px;
+    }
+
+    /* ─── SCREEN SEPARATOR ──────────────────────────────── */
+    .screen-separator {
+      text-align: center;
+      padding: 32px 0 8px;
+      font-size: 13px;
+      color: #999;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     SCREEN 1 — Proactive Notification Banner
+     Trigger: CC/Telegram detects credentials on dark web
+     State: Account NOT yet restricted
+════════════════════════════════════════════════════════ -->
+<div class="proto-label">
+  <strong>Screen 1 — Proactive Credential Exposure Alert (Notification Banner)</strong>
+  Triggered when CC/Telegram policy detects user credentials on the dark web — before account restriction
+</div>
+
+<div class="browser">
+  <!-- Top Nav -->
+  <div class="top-nav">
+    <div class="intuit-logo">intuit</div>
+    <div class="search-icon">&#9906;</div>
+  </div>
+
+  <div class="page-layout">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <a class="sidebar-item">Overview</a>
+      <a class="sidebar-item active">Sign in &amp; security</a>
+      <a class="sidebar-item">Profile</a>
+      <a class="sidebar-item">Business profile</a>
+      <a class="sidebar-item">Data &amp; privacy</a>
+      <a class="sidebar-item">Preferences</a>
+      <a class="sidebar-item">Products &amp; billing</a>
+    </nav>
+
+    <!-- Main -->
+    <main class="main-content">
+      <div class="page-header">
+        <span class="lock-icon">🔒</span>
+        <h1>Sign in &amp; security</h1>
+        <p>Update the way you sign in to your Intuit products.</p>
+      </div>
+
+      <!-- PROACTIVE BANNER -->
+      <div class="banner-warning">
+        <div class="banner-icon">⚠️</div>
+        <div class="banner-body">
+          <div class="banner-title">Your sign-in credentials were found on the dark web</div>
+          <div class="banner-text">
+            We detected that your Intuit account credentials may have been exposed in a third-party data breach.
+            Your account is currently active, but we strongly recommend you update your password immediately to prevent unauthorized access.
+          </div>
+          <div class="banner-actions">
+            <button class="btn-primary">Update password now</button>
+            <button class="btn-secondary">Set up a passkey instead</button>
+            <button class="btn-dismiss">Remind me later</button>
+          </div>
+        </div>
+        <button class="banner-close">&#x2715;</button>
+      </div>
+
+      <!-- Sign in info card -->
+      <div class="card">
+        <div class="card-title">Sign in info</div>
+        <div class="card-subtitle">We'll use this info to help make sure only you can sign in to your account.</div>
+
+        <div class="card-row">
+          <div>
+            <div class="card-row-label">Email address</div>
+            <div class="card-row-value">m••••••@gmail.com</div>
+          </div>
+          <a class="card-row-action">Edit</a>
+        </div>
+
+        <div class="card-row">
+          <div>
+            <div class="card-row-label">
+              Password
+              <span class="badge-action-needed">Action needed</span>
+            </div>
+            <div class="card-row-value">Last changed 14 months ago</div>
+          </div>
+          <a class="card-row-action">Update password</a>
+        </div>
+
+        <div class="card-row">
+          <div>
+            <div class="card-row-label">Phone number</div>
+            <div class="card-row-value">••• ••• 4821</div>
+          </div>
+          <a class="card-row-action">Edit</a>
+        </div>
+      </div>
+
+      <!-- Passkey promo -->
+      <div class="passkey-promo">
+        <div class="passkey-icon">🔑</div>
+        <div class="passkey-body">
+          <div class="passkey-title">Switch to a passkey — no password needed</div>
+          <div class="passkey-text">Passkeys are more secure than passwords and can't be leaked in data breaches. Set one up in under a minute.</div>
+        </div>
+        <a class="passkey-cta">Set up passkey &rsaquo;</a>
+      </div>
+
+      <div class="section-divider">Two-step verification</div>
+
+      <!-- 2SV card -->
+      <div class="card">
+        <div class="card-title">Two-step verification</div>
+        <div class="card-subtitle">Add an extra layer of security to your account.</div>
+
+        <div class="card-row">
+          <div>
+            <div class="card-row-label">Authenticator app</div>
+            <div class="card-row-value">Not set up</div>
+          </div>
+          <a class="card-row-action">Set up</a>
+        </div>
+
+        <div class="card-row">
+          <div>
+            <div class="card-row-label">Text message (SMS)</div>
+            <div class="card-row-value">Enabled · ••• ••• 4821</div>
+          </div>
+          <a class="card-row-action">Edit</a>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SCREEN 2 — OINP Post-Restriction Notification
+     Trigger: Account has been deactivated/restricted
+     State: Account RESTRICTED — user must act to restore
+════════════════════════════════════════════════════════ -->
+<div class="screen-separator">&#x2014;&#x2014;&#x2014; Screen 2 &#x2014;&#x2014;&#x2014;</div>
+
+<div class="proto-label">
+  <strong>Screen 2 — OINP Post-Restriction Message</strong>
+  Triggered after account is deactivated/restricted by CC or Telegram policy — replaces generic decline message
+</div>
+
+<div class="browser">
+  <!-- Top Nav -->
+  <div class="top-nav">
+    <div class="intuit-logo">intuit</div>
+    <div class="search-icon">&#9906;</div>
+  </div>
+
+  <div class="page-layout">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <a class="sidebar-item">Overview</a>
+      <a class="sidebar-item active">Sign in &amp; security</a>
+      <a class="sidebar-item">Profile</a>
+      <a class="sidebar-item">Business profile</a>
+      <a class="sidebar-item">Data &amp; privacy</a>
+      <a class="sidebar-item">Preferences</a>
+      <a class="sidebar-item">Products &amp; billing</a>
+    </nav>
+
+    <!-- Main -->
+    <main class="main-content">
+      <div class="page-header">
+        <span class="lock-icon">🔒</span>
+        <h1>Sign in &amp; security</h1>
+        <p>Update the way you sign in to your Intuit products.</p>
+      </div>
+
+      <!-- CRITICAL / POST-RESTRICTION OINP BANNER -->
+      <div class="banner-critical">
+        <div class="banner-icon">🚨</div>
+        <div class="banner-body">
+          <div class="banner-title">Your account has been restricted due to compromised credentials</div>
+          <div class="banner-text">
+            We found your Intuit sign-in credentials circulating on the dark web as part of a third-party data breach.
+            To protect you, we've temporarily restricted access to your account.
+            Update your password to restore full access — this takes less than 2 minutes.
+          </div>
+          <div class="banner-actions">
+            <button class="btn-danger">Update password to restore access</button>
+            <button class="btn-secondary">Set up a passkey instead</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sign in info card — restricted state -->
+      <div class="card">
+        <div class="card-title">Sign in info</div>
+        <div class="card-subtitle">We'll use this info to help make sure only you can sign in to your account.</div>
+
+        <div class="card-row">
+          <div>
+            <div class="card-row-label">Email address</div>
+            <div class="card-row-value">m••••••@gmail.com</div>
+          </div>
+          <a class="card-row-action">Edit</a>
+        </div>
+
+        <div class="card-row">
+          <div>
+            <div class="card-row-label">
+              Password
+              <span class="badge-restricted">Compromised</span>
+            </div>
+            <div class="card-row-value">Exposed in a data breach — update required</div>
+          </div>
+          <a class="card-row-action" style="color:#D0021B;">Update now</a>
+        </div>
+
+        <div class="card-row">
+          <div>
+            <div class="card-row-label">Phone number</div>
+            <div class="card-row-value">••• ••• 4821</div>
+          </div>
+          <a class="card-row-action">Edit</a>
+        </div>
+      </div>
+
+      <!-- Passkey promo (elevated in this state) -->
+      <div class="passkey-promo">
+        <div class="passkey-icon">🔑</div>
+        <div class="passkey-body">
+          <div class="passkey-title">Prevent this from happening again — switch to a passkey</div>
+          <div class="passkey-text">Passkeys can't be stolen or leaked in data breaches. Once you update your password, set up a passkey to secure your account for good.</div>
+        </div>
+        <a class="passkey-cta">Learn about passkeys &rsaquo;</a>
+      </div>
+
+      <div class="section-divider">Two-step verification</div>
+
+      <div class="card">
+        <div class="card-title">Two-step verification</div>
+        <div class="card-subtitle">Add an extra layer of security to your account.</div>
+
+        <div class="card-row">
+          <div>
+            <div class="card-row-label">Authenticator app</div>
+            <div class="card-row-value">Not set up</div>
+          </div>
+          <a class="card-row-action">Set up</a>
+        </div>
+
+        <div class="card-row">
+          <div>
+            <div class="card-row-label">Text message (SMS)</div>
+            <div class="card-row-value">Enabled · ••• ••• 4821</div>
+          </div>
+          <a class="card-row-action">Edit</a>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+</body>
+</html>

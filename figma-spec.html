@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Figma Spec — Dark Net Comms Prototypes</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F0F2F5; color: #1a1a1a; }
+
+    /* PAGE HEADER */
+    .page-title {
+      background: #1E1E2E;
+      color: #fff;
+      padding: 28px 40px;
+    }
+    .page-title h1 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    .page-title p { font-size: 13px; color: #aaa; }
+
+    /* SECTION */
+    .section {
+      max-width: 1100px;
+      margin: 32px auto;
+      padding: 0 24px;
+    }
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 12px;
+    }
+
+    /* SPEC CARD */
+    .spec-card {
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid #e0e0e0;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .spec-card-header {
+      background: #F7F8FA;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .spec-card-header .screen-tag {
+      background: #1E1E2E;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+    .spec-card-header .screen-tag.s2 { background: #D0021B; }
+    .spec-card-header h2 { font-size: 15px; font-weight: 700; color: #1a1a1a; }
+    .spec-card-header p { font-size: 12px; color: #888; margin-top: 1px; }
+    .spec-card-body { padding: 20px; }
+
+    /* TWO COL */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+    /* SPEC GROUP */
+    .spec-group { margin-bottom: 20px; }
+    .spec-group-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #0077C5;
+      border-bottom: 2px solid #e8f4fb;
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+    }
+
+    /* SPEC ROW */
+    .spec-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 7px 0;
+      border-bottom: 1px solid #f5f5f5;
+      gap: 12px;
+    }
+    .spec-row:last-child { border-bottom: none; }
+    .spec-key { font-size: 12px; color: #666; flex-shrink: 0; width: 140px; }
+    .spec-val { font-size: 12px; font-weight: 600; color: #1a1a1a; text-align: right; font-family: 'SF Mono', 'Fira Code', monospace; }
+
+    /* COLOR SWATCH */
+    .color-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+    .color-swatch {
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #e0e0e0;
+    }
+    .swatch-block { height: 48px; }
+    .swatch-info { padding: 7px 10px; background: #fff; }
+    .swatch-name { font-size: 11px; font-weight: 700; color: #333; }
+    .swatch-hex { font-size: 11px; color: #888; font-family: monospace; }
+
+    /* COMPONENT SPEC */
+    .component-box {
+      border: 1.5px dashed #ccc;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .component-box-label {
+      position: absolute;
+      top: -10px;
+      left: 12px;
+      background: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      color: #0077C5;
+      padding: 0 6px;
+      letter-spacing: 0.5px;
+    }
+
+    /* PREVIEW STRIP */
+    .preview-strip {
+      background: #fafafa;
+      border-top: 1px solid #e0e0e0;
+      padding: 20px;
+    }
+    .preview-strip-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 12px;
+    }
+
+    /* ACTUAL UI COMPONENTS (mini preview) */
+    .banner-warn-preview {
+      display: flex; gap: 12px; align-items: flex-start;
+      background: #FFF8E7; border: 1.5px solid #F5A623; border-radius: 8px;
+      padding: 14px 16px; margin-bottom: 10px;
+    }
+    .banner-crit-preview {
+      display: flex; gap: 12px; align-items: flex-start;
+      background: #FEF0F0; border: 1.5px solid #D0021B; border-radius: 8px;
+      padding: 14px 16px; margin-bottom: 10px;
+    }
+    .preview-title { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+    .preview-text { font-size: 12px; line-height: 1.4; margin-bottom: 10px; }
+    .preview-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pbtn-primary { background:#0077C5; color:#fff; border:none; padding:6px 14px; border-radius:4px; font-size:12px; font-weight:600; }
+    .pbtn-secondary { background:transparent; color:#0077C5; border:1.5px solid #0077C5; padding:5px 12px; border-radius:4px; font-size:12px; font-weight:600; }
+    .pbtn-danger { background:#D0021B; color:#fff; border:none; padding:6px 14px; border-radius:4px; font-size:12px; font-weight:600; }
+    .pbtn-dismiss { background:none; border:none; color:#8a5000; font-size:11px; text-decoration:underline; }
+    .passkey-preview {
+      display:flex; gap:12px; align-items:center;
+      background:#EAF5FF; border:1px solid #b3d9f5; border-radius:8px; padding:12px 14px;
+    }
+    .passkey-preview-body { flex:1; }
+    .passkey-preview-title { font-size:12px; font-weight:700; color:#004a7c; margin-bottom:2px; }
+    .passkey-preview-text { font-size:11px; color:#2a6496; }
+    .passkey-preview-cta { font-size:12px; color:#0077C5; font-weight:600; white-space:nowrap; }
+    .badge-warn { display:inline-block; background:#fff3d6; color:#8a5000; font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; margin-left:6px; }
+    .badge-crit { display:inline-block; background:#fde8ea; color:#a30014; font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; margin-left:6px; }
+
+    /* SPACING DIAGRAM */
+    .spacing-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .spacing-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+    }
+    .spacing-bar {
+      height: 8px;
+      border-radius: 2px;
+      background: #0077C5;
+      opacity: 0.7;
+    }
+    .spacing-label { color: #666; min-width: 160px; }
+    .spacing-val { font-family: monospace; font-size: 11px; color: #333; font-weight: 600; }
+
+    /* TYPOGRAPHY */
+    .type-row { padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+    .type-row:last-child { border-bottom: none; }
+    .type-sample { margin-bottom: 4px; }
+    .type-meta { font-size: 11px; color: #888; font-family: monospace; }
+
+    /* ANNOTATION TABLE */
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { background: #F7F8FA; text-align: left; padding: 8px 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; color: #555; border-bottom: 2px solid #e0e0e0; }
+    td { padding: 9px 12px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    td:first-child { font-weight: 600; color: #333; }
+    .tag-p0 { background:#fde8ea; color:#a30014; font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
+
+    /* FIGMA NOTES */
+    .figma-note {
+      background: #FFFBEA;
+      border-left: 4px solid #F5A623;
+      padding: 10px 14px;
+      border-radius: 0 6px 6px 0;
+      font-size: 12px;
+      color: #5a3e00;
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+    .figma-note strong { display: block; font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 3px; color: #8a5000; }
+
+    hr { border: none; border-top: 1px solid #e0e0e0; margin: 8px 0; }
+  </style>
+</head>
+<body>
+
+<div class="page-title">
+  <h1>Figma Spec Sheet — Dark Net Comms: CC Policy Communication Improvements</h1>
+  <p>Intuit Security Center · Sign in &amp; security · 2 screens · All measurements in px · Frame width: 1280px</p>
+</div>
+
+<!-- ═══════════ SECTION: FRAME STRUCTURE ═══════════ -->
+<div class="section">
+  <div class="section-label">01 — Figma Frame Structure</div>
+  <div class="spec-card">
+    <div class="spec-card-body">
+      <table>
+        <thead>
+          <tr>
+            <th>Frame Name</th>
+            <th>Width</th>
+            <th>Height</th>
+            <th>PRD Requirement</th>
+            <th>Priority</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>S1 · Proactive Banner — Credential Exposure Alert</td>
+            <td>1280px</td>
+            <td>~900px</td>
+            <td>Notification Banner — Proactive Credential Exposure Alert</td>
+            <td><span class="tag-p0">P0</span></td>
+          </tr>
+          <tr>
+            <td>S2 · OINP — Post-Restriction Message</td>
+            <td>1280px</td>
+            <td>~900px</td>
+            <td>OINP replacement for generic decline message + Passkey Promotion</td>
+            <td><span class="tag-p0">P0</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="figma-note">
+        <strong>Figma tip</strong>
+        Create both frames at 1280×900 in a single page called "Dark Net Comms — CC Policy". Use Auto Layout on the main content area so spacing is editable. Name layers exactly as shown above for easy handoff.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SECTION: LAYOUT GRID ═══════════ -->
+<div class="section">
+  <div class="section-label">02 — Layout & Grid</div>
+  <div class="spec-card">
+    <div class="spec-card-body">
+      <div class="two-col">
+        <div>
+          <div class="spec-group">
+            <div class="spec-group-title">Top Navigation Bar</div>
+            <div class="spec-row"><span class="spec-key">Height</span><span class="spec-val">52px</span></div>
+            <div class="spec-row"><span class="spec-key">Background</span><span class="spec-val">#FFFFFF</span></div>
+            <div class="spec-row"><span class="spec-key">Border bottom</span><span class="spec-val">1px #E5E5E5</span></div>
+            <div class="spec-row"><span class="spec-key">Horizontal padding</span><span class="spec-val">24px</span></div>
+          </div>
+          <div class="spec-group">
+            <div class="spec-group-title">Left Sidebar</div>
+            <div class="spec-row"><span class="spec-key">Width</span><span class="spec-val">200px</span></div>
+            <div class="spec-row"><span class="spec-key">Background</span><span class="spec-val">#FFFFFF</span></div>
+            <div class="spec-row"><span class="spec-key">Border right</span><span class="spec-val">1px #E5E5E5</span></div>
+            <div class="spec-row"><span class="spec-key">Item height</span><span class="spec-val">40px</span></div>
+            <div class="spec-row"><span class="spec-key">Item padding</span><span class="spec-val">11px 20px</span></div>
+            <div class="spec-row"><span class="spec-key">Active border-left</span><span class="spec-val">3px #0077C5</span></div>
+            <div class="spec-row"><span class="spec-key">Active background</span><span class="spec-val">#E8F4FB</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="spec-group">
+            <div class="spec-group-title">Main Content Area</div>
+            <div class="spec-row"><span class="spec-key">Left offset</span><span class="spec-val">200px (sidebar)</span></div>
+            <div class="spec-row"><span class="spec-key">Horizontal padding</span><span class="spec-val">40px each side</span></div>
+            <div class="spec-row"><span class="spec-key">Content max-width</span><span class="spec-val">~760px centered</span></div>
+            <div class="spec-row"><span class="spec-key">Background</span><span class="spec-val">#FAFAFA</span></div>
+            <div class="spec-row"><span class="spec-key">Bottom padding</span><span class="spec-val">60px</span></div>
+          </div>
+          <div class="spec-group">
+            <div class="spec-group-title">Page Header (centered)</div>
+            <div class="spec-row"><span class="spec-key">Top padding</span><span class="spec-val">36px</span></div>
+            <div class="spec-row"><span class="spec-key">Bottom padding</span><span class="spec-val">28px</span></div>
+            <div class="spec-row"><span class="spec-key">Icon size</span><span class="spec-val">40px</span></div>
+            <div class="spec-row"><span class="spec-key">Icon → H1 gap</span><span class="spec-val">10px</span></div>
+            <div class="spec-row"><span class="spec-key">H1 → subtitle gap</span><span class="spec-val">6px</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SECTION: COLOR TOKENS ═══════════ -->
+<div class="section">
+  <div class="section-label">03 — Color Tokens</div>
+  <div class="spec-card">
+    <div class="spec-card-body">
+      <div class="color-grid">
+        <div class="color-swatch">
+          <div class="swatch-block" style="background:#0077C5;"></div>
+          <div class="swatch-info"><div class="swatch-name">Intuit Blue</div><div class="swatch-hex">#0077C5</div></div>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch-block" style="background:#E8F4FB;"></div>
+          <div class="swatch-info"><div class="swatch-name">Blue Light</div><div class="swatch-hex">#E8F4FB</div></div>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch-block" style="background:#EAF5FF;"></div>
+          <div class="swatch-info"><div class="swatch-name">Passkey BG</div><div class="swatch-hex">#EAF5FF</div></div>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch-block" style="background:#D0021B;"></div>
+          <div class="swatch-info"><div class="swatch-name">Critical Red</div><div class="swatch-hex">#D0021B</div></div>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch-block" style="background:#FEF0F0;"></div>
+          <div class="swatch-info"><div class="swatch-name">Red Light BG</div><div class="swatch-hex">#FEF0F0</div></div>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch-block" style="background:#F5A623;"></div>
+          <div class="swatch-info"><div class="swatch-name">Warning Amber</div><div class="swatch-hex">#F5A623</div></div>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch-block" style="background:#FFF8E7;"></div>
+          <div class="swatch-info"><div class="swatch-name">Amber Light BG</div><div class="swatch-hex">#FFF8E7</div></div>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch-block" style="background:#2D2D2D;"></div>
+          <div class="swatch-info"><div class="swatch-name">Text Primary</div><div class="swatch-hex">#2D2D2D</div></div>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch-block" style="background:#6B6B6B;"></div>
+          <div class="swatch-info"><div class="swatch-name">Text Secondary</div><div class="swatch-hex">#6B6B6B</div></div>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch-block" style="background:#E0E0E0;"></div>
+          <div class="swatch-info"><div class="swatch-name">Border Default</div><div class="swatch-hex">#E0E0E0</div></div>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch-block" style="background:#FFFFFF; border:1px solid #eee;"></div>
+          <div class="swatch-info"><div class="swatch-name">Surface White</div><div class="swatch-hex">#FFFFFF</div></div>
+        </div>
+        <div class="color-swatch">
+          <div class="swatch-block" style="background:#FAFAFA;"></div>
+          <div class="swatch-info"><div class="swatch-name">Surface Gray</div><div class="swatch-hex">#FAFAFA</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SECTION: TYPOGRAPHY ═══════════ -->
+<div class="section">
+  <div class="section-label">04 — Typography</div>
+  <div class="spec-card">
+    <div class="spec-card-body">
+      <div class="figma-note" style="margin-bottom:16px; margin-top:0;">
+        <strong>Font Family</strong>
+        Intuit uses <strong>Avenir Next</strong> (licensed). In Figma, use "Avenir Next" if available on your machine, or substitute with <strong>Inter</strong> for mockups.
+      </div>
+      <div class="type-row">
+        <div class="type-sample" style="font-size:28px; font-weight:700; color:#2d2d2d;">Sign in &amp; security</div>
+        <div class="type-meta">Page H1 · 28px · Bold (700) · #2D2D2D · Letter-spacing: -0.3px</div>
+      </div>
+      <div class="type-row">
+        <div class="type-sample" style="font-size:17px; font-weight:700; color:#2d2d2d;">Sign in info</div>
+        <div class="type-meta">Card Title · 17px · Bold (700) · #2D2D2D</div>
+      </div>
+      <div class="type-row">
+        <div class="type-sample" style="font-size:15px; font-weight:700; color:#8a5000;">Your sign-in credentials were found on the dark web</div>
+        <div class="type-meta">Banner Title (warning) · 15px · Bold (700) · #8A5000</div>
+      </div>
+      <div class="type-row">
+        <div class="type-sample" style="font-size:15px; font-weight:700; color:#a30014;">Your account has been restricted due to compromised credentials</div>
+        <div class="type-meta">Banner Title (critical) · 15px · Bold (700) · #A30014</div>
+      </div>
+      <div class="type-row">
+        <div class="type-sample" style="font-size:13.5px; color:#6b4000; line-height:1.5;">We detected that your Intuit account credentials may have been exposed in a third-party data breach.</div>
+        <div class="type-meta">Banner Body · 13.5px · Regular (400) · #6B4000 (warning) / #7A000F (critical) · Line-height: 1.5</div>
+      </div>
+      <div class="type-row">
+        <div class="type-sample" style="font-size:14px; font-weight:500; color:#4a4a4a;">Password</div>
+        <div class="type-meta">Card Row Label · 14px · Medium (500) · #4A4A4A</div>
+      </div>
+      <div class="type-row">
+        <div class="type-sample" style="font-size:14px; color:#6b6b6b;">Last changed 14 months ago</div>
+        <div class="type-meta">Card Row Value · 14px · Regular (400) · #6B6B6B</div>
+      </div>
+      <div class="type-row">
+        <div class="type-sample" style="font-size:13px; color:#0077C5; font-weight:600;">Edit</div>
+        <div class="type-meta">Card Row Action Link · 13px · SemiBold (600) · #0077C5</div>
+      </div>
+      <div class="type-row">
+        <div class="type-sample" style="font-size:15px; color:#6b6b6b;">Update the way you sign in to your Intuit products.</div>
+        <div class="type-meta">Page Subtitle · 15px · Regular (400) · #6B6B6B</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SECTION: COMPONENT SPECS — SCREEN 1 ═══════════ -->
+<div class="section">
+  <div class="section-label">05 — Screen 1 Components: Proactive Warning Banner</div>
+  <div class="spec-card">
+    <div class="spec-card-header">
+      <div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="screen-tag">S1</span>
+          <h2>Warning Banner — Credential Exposure Detected</h2>
+        </div>
+        <p>Shown at top of Sign in &amp; security page · Account still active · User must act proactively</p>
+      </div>
+    </div>
+
+    <div class="preview-strip">
+      <div class="preview-strip-label">Component Preview</div>
+      <div class="banner-warn-preview">
+        <span style="font-size:20px;">⚠️</span>
+        <div style="flex:1;">
+          <div class="preview-title" style="color:#8a5000;">Your sign-in credentials were found on the dark web</div>
+          <div class="preview-text" style="color:#6b4000;">We detected that your Intuit account credentials may have been exposed in a third-party data breach. Your account is currently active, but we strongly recommend you update your password immediately to prevent unauthorized access.</div>
+          <div class="preview-btns">
+            <button class="pbtn-primary">Update password now</button>
+            <button class="pbtn-secondary">Set up a passkey instead</button>
+            <button class="pbtn-dismiss">Remind me later</button>
+          </div>
+        </div>
+        <span style="color:#aaa; font-size:16px; cursor:pointer;">✕</span>
+      </div>
+    </div>
+
+    <div class="spec-card-body">
+      <div class="two-col">
+        <div>
+          <div class="spec-group">
+            <div class="spec-group-title">Banner Container</div>
+            <div class="spec-row"><span class="spec-key">Background</span><span class="spec-val">#FFF8E7</span></div>
+            <div class="spec-row"><span class="spec-key">Border</span><span class="spec-val">1.5px solid #F5A623</span></div>
+            <div class="spec-row"><span class="spec-key">Border radius</span><span class="spec-val">8px</span></div>
+            <div class="spec-row"><span class="spec-key">Padding</span><span class="spec-val">16px 20px</span></div>
+            <div class="spec-row"><span class="spec-key">Gap (icon → body)</span><span class="spec-val">14px</span></div>
+            <div class="spec-row"><span class="spec-key">Position</span><span class="spec-val">Above all cards</span></div>
+            <div class="spec-row"><span class="spec-key">Bottom margin</span><span class="spec-val">20px</span></div>
+            <div class="spec-row"><span class="spec-key">Dismissible</span><span class="spec-val">Yes — ✕ top right</span></div>
+          </div>
+          <div class="spec-group">
+            <div class="spec-group-title">Warning Icon</div>
+            <div class="spec-row"><span class="spec-key">Icon</span><span class="spec-val">⚠️ (22px)</span></div>
+            <div class="spec-row"><span class="spec-key">Align</span><span class="spec-val">flex-start (top)</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="spec-group">
+            <div class="spec-group-title">CTA Buttons</div>
+            <div class="spec-row"><span class="spec-key">Primary bg</span><span class="spec-val">#0077C5</span></div>
+            <div class="spec-row"><span class="spec-key">Primary text</span><span class="spec-val">#FFFFFF · 13px · 600</span></div>
+            <div class="spec-row"><span class="spec-key">Primary padding</span><span class="spec-val">8px 18px</span></div>
+            <div class="spec-row"><span class="spec-key">Primary radius</span><span class="spec-val">5px</span></div>
+            <div class="spec-row"><span class="spec-key">Secondary border</span><span class="spec-val">1.5px #0077C5</span></div>
+            <div class="spec-row"><span class="spec-key">Secondary text</span><span class="spec-val">#0077C5 · 13px · 600</span></div>
+            <div class="spec-row"><span class="spec-key">Secondary bg</span><span class="spec-val">Transparent</span></div>
+            <div class="spec-row"><span class="spec-key">Button gap</span><span class="spec-val">10px</span></div>
+            <div class="spec-row"><span class="spec-key">Dismiss link</span><span class="spec-val">#8A5000 · 12px · underline</span></div>
+          </div>
+          <div class="spec-group">
+            <div class="spec-group-title">Password Row Badge</div>
+            <div class="spec-row"><span class="spec-key">Label text</span><span class="spec-val">Action needed</span></div>
+            <div class="spec-row"><span class="spec-key">Background</span><span class="spec-val">#FFF3D6</span></div>
+            <div class="spec-row"><span class="spec-key">Text color</span><span class="spec-val">#8A5000</span></div>
+            <div class="spec-row"><span class="spec-key">Font</span><span class="spec-val">11px · Bold · 10px radius</span></div>
+            <div class="spec-row"><span class="spec-key">Padding</span><span class="spec-val">2px 8px</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SECTION: COMPONENT SPECS — SCREEN 2 ═══════════ -->
+<div class="section">
+  <div class="section-label">06 — Screen 2 Components: OINP Post-Restriction Banner</div>
+  <div class="spec-card">
+    <div class="spec-card-header">
+      <div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="screen-tag s2">S2</span>
+          <h2>Critical Banner — Account Restricted</h2>
+        </div>
+        <p>Replaces generic decline message · Account restricted · User must update password to restore access</p>
+      </div>
+    </div>
+
+    <div class="preview-strip">
+      <div class="preview-strip-label">Component Preview</div>
+      <div class="banner-crit-preview">
+        <span style="font-size:20px;">🚨</span>
+        <div style="flex:1;">
+          <div class="preview-title" style="color:#a30014;">Your account has been restricted due to compromised credentials</div>
+          <div class="preview-text" style="color:#7a000f;">We found your Intuit sign-in credentials circulating on the dark web as part of a third-party data breach. To protect you, we've temporarily restricted access to your account. Update your password to restore full access — this takes less than 2 minutes.</div>
+          <div class="preview-btns">
+            <button class="pbtn-danger">Update password to restore access</button>
+            <button class="pbtn-secondary">Set up a passkey instead</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spec-card-body">
+      <div class="two-col">
+        <div>
+          <div class="spec-group">
+            <div class="spec-group-title">Banner Container</div>
+            <div class="spec-row"><span class="spec-key">Background</span><span class="spec-val">#FEF0F0</span></div>
+            <div class="spec-row"><span class="spec-key">Border</span><span class="spec-val">1.5px solid #D0021B</span></div>
+            <div class="spec-row"><span class="spec-key">Border radius</span><span class="spec-val">8px</span></div>
+            <div class="spec-row"><span class="spec-key">Padding</span><span class="spec-val">16px 20px</span></div>
+            <div class="spec-row"><span class="spec-key">Gap (icon → body)</span><span class="spec-val">14px</span></div>
+            <div class="spec-row"><span class="spec-key">Dismissible</span><span class="spec-val">No — persistent until resolved</span></div>
+            <div class="spec-row"><span class="spec-key">Bottom margin</span><span class="spec-val">20px</span></div>
+          </div>
+          <div class="spec-group">
+            <div class="spec-group-title">Password Row Badge</div>
+            <div class="spec-row"><span class="spec-key">Label text</span><span class="spec-val">Compromised</span></div>
+            <div class="spec-row"><span class="spec-key">Background</span><span class="spec-val">#FDE8EA</span></div>
+            <div class="spec-row"><span class="spec-key">Text color</span><span class="spec-val">#A30014</span></div>
+            <div class="spec-row"><span class="spec-key">Font</span><span class="spec-val">11px · Bold · 10px radius</span></div>
+            <div class="spec-row"><span class="spec-key">Row action color</span><span class="spec-val">#D0021B (not blue)</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="spec-group">
+            <div class="spec-group-title">CTA Buttons</div>
+            <div class="spec-row"><span class="spec-key">Primary bg</span><span class="spec-val">#D0021B</span></div>
+            <div class="spec-row"><span class="spec-key">Primary text</span><span class="spec-val">#FFFFFF · 13px · 600</span></div>
+            <div class="spec-row"><span class="spec-key">Primary padding</span><span class="spec-val">8px 18px</span></div>
+            <div class="spec-row"><span class="spec-key">Primary radius</span><span class="spec-val">5px</span></div>
+            <div class="spec-row"><span class="spec-key">Secondary</span><span class="spec-val">Same as S1 secondary</span></div>
+            <div class="spec-row"><span class="spec-key">No dismiss link</span><span class="spec-val">Banner is non-dismissible</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SECTION: SHARED COMPONENTS ═══════════ -->
+<div class="section">
+  <div class="section-label">07 — Shared Components (both screens)</div>
+  <div class="spec-card">
+    <div class="spec-card-body">
+      <div class="two-col">
+
+        <!-- CARD -->
+        <div>
+          <div class="spec-group">
+            <div class="spec-group-title">Info Card</div>
+            <div class="spec-row"><span class="spec-key">Background</span><span class="spec-val">#FFFFFF</span></div>
+            <div class="spec-row"><span class="spec-key">Border</span><span class="spec-val">1px solid #E0E0E0</span></div>
+            <div class="spec-row"><span class="spec-key">Border radius</span><span class="spec-val">8px</span></div>
+            <div class="spec-row"><span class="spec-key">Padding</span><span class="spec-val">24px 28px</span></div>
+            <div class="spec-row"><span class="spec-key">Bottom margin</span><span class="spec-val">16px</span></div>
+            <div class="spec-row"><span class="spec-key">Row divider</span><span class="spec-val">1px solid #F0F0F0</span></div>
+            <div class="spec-row"><span class="spec-key">Row height</span><span class="spec-val">~48px</span></div>
+          </div>
+          <div class="spec-group">
+            <div class="spec-group-title">Sidebar Nav Item</div>
+            <div class="spec-row"><span class="spec-key">Default bg</span><span class="spec-val">#FFFFFF</span></div>
+            <div class="spec-row"><span class="spec-key">Active bg</span><span class="spec-val">#E8F4FB</span></div>
+            <div class="spec-row"><span class="spec-key">Active left border</span><span class="spec-val">3px #0077C5</span></div>
+            <div class="spec-row"><span class="spec-key">Active text</span><span class="spec-val">#0077C5 · 14px · 600</span></div>
+            <div class="spec-row"><span class="spec-key">Default text</span><span class="spec-val">#3D3D3D · 14px · 400</span></div>
+          </div>
+        </div>
+
+        <!-- PASSKEY PROMO -->
+        <div>
+          <div class="spec-group">
+            <div class="spec-group-title">Passkey Promo Card</div>
+            <div class="spec-row"><span class="spec-key">Background</span><span class="spec-val">#EAF5FF</span></div>
+            <div class="spec-row"><span class="spec-key">Border</span><span class="spec-val">1px solid #B3D9F5</span></div>
+            <div class="spec-row"><span class="spec-key">Border radius</span><span class="spec-val">8px</span></div>
+            <div class="spec-row"><span class="spec-key">Padding</span><span class="spec-val">14px 20px</span></div>
+            <div class="spec-row"><span class="spec-key">Icon</span><span class="spec-val">🔑 · 26px</span></div>
+            <div class="spec-row"><span class="spec-key">Title</span><span class="spec-val">#004A7C · 14px · 700</span></div>
+            <div class="spec-row"><span class="spec-key">Body text</span><span class="spec-val">#2A6496 · 13px · 400</span></div>
+            <div class="spec-row"><span class="spec-key">CTA</span><span class="spec-val">#0077C5 · 13px · 600</span></div>
+            <div class="spec-row"><span class="spec-key">Top margin</span><span class="spec-val">12px (below info card)</span></div>
+          </div>
+
+          <div style="margin-top:12px;">
+            <div class="passkey-preview">
+              <span style="font-size:22px;">🔑</span>
+              <div class="passkey-preview-body">
+                <div class="passkey-preview-title">Switch to a passkey — no password needed</div>
+                <div class="passkey-preview-text">Passkeys are more secure and can't be leaked in data breaches.</div>
+              </div>
+              <span class="passkey-preview-cta">Set up passkey ›</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SECTION: SPACING ═══════════ -->
+<div class="section">
+  <div class="section-label">08 — Spacing Reference</div>
+  <div class="spec-card">
+    <div class="spec-card-body">
+      <div class="spacing-diagram">
+        <div class="spacing-row"><span class="spacing-label">Page header top padding</span><div class="spacing-bar" style="width:180px;"></div><span class="spacing-val">36px</span></div>
+        <div class="spacing-row"><span class="spacing-label">Banner → first card gap</span><div class="spacing-bar" style="width:100px;"></div><span class="spacing-val">20px</span></div>
+        <div class="spacing-row"><span class="spacing-label">Card → card gap</span><div class="spacing-bar" style="width:80px;"></div><span class="spacing-val">16px</span></div>
+        <div class="spacing-row"><span class="spacing-label">Card inner padding</span><div class="spacing-bar" style="width:120px;"></div><span class="spacing-val">24px 28px</span></div>
+        <div class="spacing-row"><span class="spacing-label">Banner inner padding</span><div class="spacing-bar" style="width:80px;"></div><span class="spacing-val">16px 20px</span></div>
+        <div class="spacing-row"><span class="spacing-label">Icon ↔ banner body gap</span><div class="spacing-bar" style="width:70px;"></div><span class="spacing-val">14px</span></div>
+        <div class="spacing-row"><span class="spacing-label">Button gap (row)</span><div class="spacing-bar" style="width:50px;"></div><span class="spacing-val">10px</span></div>
+        <div class="spacing-row"><span class="spacing-label">Banner title → body gap</span><div class="spacing-bar" style="width:20px;"></div><span class="spacing-val">4px</span></div>
+        <div class="spacing-row"><span class="spacing-label">Banner body → buttons gap</span><div class="spacing-bar" style="width:60px;"></div><span class="spacing-val">12px</span></div>
+        <div class="spacing-row"><span class="spacing-label">Section label top margin</span><div class="spacing-bar" style="width:140px;"></div><span class="spacing-val">28px</span></div>
+        <div class="spacing-row"><span class="spacing-label">Main content horiz padding</span><div class="spacing-bar" style="width:200px;"></div><span class="spacing-val">40px</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SECTION: COPY ═══════════ -->
+<div class="section">
+  <div class="section-label">09 — Final Copy (ready to paste into Figma)</div>
+  <div class="spec-card">
+    <div class="spec-card-body">
+      <table>
+        <thead>
+          <tr><th>Screen</th><th>Element</th><th>Copy</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>S1</td><td>Banner title</td><td>Your sign-in credentials were found on the dark web</td></tr>
+          <tr><td>S1</td><td>Banner body</td><td>We detected that your Intuit account credentials may have been exposed in a third-party data breach. Your account is currently active, but we strongly recommend you update your password immediately to prevent unauthorized access.</td></tr>
+          <tr><td>S1</td><td>CTA 1</td><td>Update password now</td></tr>
+          <tr><td>S1</td><td>CTA 2</td><td>Set up a passkey instead</td></tr>
+          <tr><td>S1</td><td>Dismiss link</td><td>Remind me later</td></tr>
+          <tr><td>S1</td><td>Password row badge</td><td>Action needed</td></tr>
+          <tr><td>S1</td><td>Password row value</td><td>Last changed 14 months ago</td></tr>
+          <tr><td>S1</td><td>Passkey promo title</td><td>Switch to a passkey — no password needed</td></tr>
+          <tr><td>S1</td><td>Passkey promo body</td><td>Passkeys are more secure than passwords and can't be leaked in data breaches. Set one up in under a minute.</td></tr>
+          <tr><td>S1</td><td>Passkey promo CTA</td><td>Set up passkey ›</td></tr>
+          <tr><td>S2</td><td>Banner title</td><td>Your account has been restricted due to compromised credentials</td></tr>
+          <tr><td>S2</td><td>Banner body</td><td>We found your Intuit sign-in credentials circulating on the dark web as part of a third-party data breach. To protect you, we've temporarily restricted access to your account. Update your password to restore full access — this takes less than 2 minutes.</td></tr>
+          <tr><td>S2</td><td>CTA 1</td><td>Update password to restore access</td></tr>
+          <tr><td>S2</td><td>CTA 2</td><td>Set up a passkey instead</td></tr>
+          <tr><td>S2</td><td>Password row badge</td><td>Compromised</td></tr>
+          <tr><td>S2</td><td>Password row value</td><td>Exposed in a data breach — update required</td></tr>
+          <tr><td>S2</td><td>Passkey promo title</td><td>Prevent this from happening again — switch to a passkey</td></tr>
+          <tr><td>S2</td><td>Passkey promo body</td><td>Passkeys can't be stolen or leaked in data breaches. Once you update your password, set up a passkey to secure your account for good.</td></tr>
+          <tr><td>S2</td><td>Passkey promo CTA</td><td>Learn about passkeys ›</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
