@@ -531,7 +531,7 @@
     <button class="modal-close" onclick="closeModal('modal-password')">&#x2715;</button>
     <span class="modal-icon">🔐</span>
     <h2>Update your password</h2>
-    <p>Choose a strong, unique password you haven't used before. This will help secure your account from unauthorized access.</p>
+    <p>Your password appeared in a third-party data breach. Choose a new, unique password to keep your Intuit account secure.</p>
     <label class="modal-input-label">Current password</label>
     <input class="modal-input" type="password" placeholder="Enter current password"/>
     <label class="modal-input-label">New password</label>
@@ -677,7 +677,7 @@
     <button class="modal-close" onclick="closeModal('modal-remind')">&#x2715;</button>
     <span class="modal-icon">⏰</span>
     <h2>We'll remind you later</h2>
-    <p>We'll show this alert again the next time you sign in. Keep in mind your credentials are still exposed — updating sooner keeps your account safer.</p>
+    <p>We'll show this alert again the next time you sign in. We recommend updating sooner — your password appeared in a third-party breach and may still be at risk.</p>
     <div class="modal-actions">
       <button class="modal-btn-secondary" onclick="closeModal('modal-remind'); openModal('modal-password')">Update now instead</button>
       <button class="modal-btn-primary" onclick="closeModal('modal-remind'); dismissBanner()">OK, remind me later</button>
@@ -729,10 +729,10 @@
       <div class="banner-warning">
         <div class="banner-icon">⚠️</div>
         <div class="banner-body">
-          <div class="banner-title">Your sign-in credentials were found on the dark web</div>
+          <div class="banner-title">Your password may have been exposed in a data breach</div>
           <div class="banner-text">
-            We detected that your Intuit account credentials may have been exposed in a third-party data breach.
-            Your account is currently active, but we strongly recommend you update your password immediately to prevent unauthorized access.
+            We noticed your sign-in password appeared in a third-party data breach unrelated to Intuit.
+            Your account is currently active — we recommend updating your password as a precaution.
           </div>
           <div class="banner-actions">
             <button class="btn-primary" onclick="openModal('modal-password')">Update password now</button>
@@ -850,8 +850,8 @@
           <div class="notif-item" id="notif-item-main">
             <div class="notif-unread-dot" id="notif-unread-dot"></div>
             <div class="notif-item-body">
-              <div class="notif-item-title">🚨 Your account has been restricted</div>
-              <div class="notif-item-text">Your sign-in credentials were found on the dark web. We've temporarily restricted your account to keep it safe. Update your password to restore access.</div>
+              <div class="notif-item-title">🔒 We detected a security issue with your sign-in</div>
+              <div class="notif-item-text">Your password appeared in a third-party data breach. As a precaution, we've temporarily limited your account access. Updating your password takes less than 2 minutes.</div>
               <div class="notif-item-time">Just now · Intuit Security</div>
               <div class="notif-item-actions">
                 <button class="notif-btn-primary" onclick="closeBell(); openModal('modal-password')">Update password</button>
@@ -900,9 +900,9 @@
       <div class="banner-critical" style="background:#FEF0F0; border-color:#D0021B;">
         <div class="banner-icon">🚨</div>
         <div class="banner-body">
-          <div class="banner-title">Action required — check your notifications</div>
+          <div class="banner-title">We detected a security issue with your sign-in</div>
           <div class="banner-text">
-            Your account has been restricted. Click the 🔔 bell icon in the top right to view details and restore access.
+            As a precaution, we've temporarily limited access to your account. Click the 🔔 bell icon in the top right to view details and restore access.
           </div>
           <div class="banner-actions">
             <button class="btn-danger" onclick="openModal('modal-password')">Update password to restore access</button>
@@ -930,7 +930,7 @@
               Password
               <span class="badge-restricted">Compromised</span>
             </div>
-            <div class="card-row-value">Exposed in a data breach — update required</div>
+            <div class="card-row-value">Password appeared in a third-party breach — update recommended</div>
           </div>
           <a class="card-row-action" style="color:#D0021B;" onclick="openModal('modal-password')">Update now</a>
         </div>
@@ -948,8 +948,8 @@
       <div class="passkey-promo">
         <div class="passkey-icon">🔑</div>
         <div class="passkey-body">
-          <div class="passkey-title">Prevent this from happening again — switch to a passkey</div>
-          <div class="passkey-text">Passkeys can't be stolen or leaked in data breaches. Once you update your password, set up a passkey to secure your account for good.</div>
+          <div class="passkey-title">A safer alternative — sign in with a passkey</div>
+          <div class="passkey-text">Unlike passwords, passkeys aren't stored in ways that can appear in data breaches. Set one up to reduce this risk going forward.</div>
         </div>
         <a class="passkey-cta" onclick="openModal('modal-passkey')">Learn about passkeys &rsaquo;</a>
       </div>
