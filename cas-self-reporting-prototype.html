@@ -1,0 +1,2628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAS — Customer Self-Reporting & Self-Remediation | Intuit Security Center</title>
+<style>
+  /* ─── Reset & Base ─────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'AvenirNext', 'Avenir Next', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f0f0f2;
+    color: #2d2d2d;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ─── Prototype Layout ──────────────────────────────────────────────── */
+  .prototype-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+  .prototype-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .prototype-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2d2d2d;
+    margin-bottom: 8px;
+  }
+  .prototype-header p {
+    color: #6b6b6b;
+    font-size: 15px;
+  }
+  .prototype-header .feature-tag {
+    display: inline-block;
+    background: #e8f4fb;
+    color: #0077C5;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .proto-label {
+    margin-bottom: 12px;
+    padding: 10px 16px;
+    background: #fff;
+    border-left: 4px solid #0077C5;
+    border-radius: 0 6px 6px 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+  }
+  .proto-label strong {
+    display: block;
+    font-size: 13px;
+    color: #0077C5;
+    margin-bottom: 2px;
+  }
+  .proto-label span {
+    font-size: 12px;
+    color: #6b6b6b;
+  }
+
+  .screen-wrapper {
+    margin-bottom: 64px;
+  }
+
+  /* ─── Browser Chrome ────────────────────────────────────────────────── */
+  .browser {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.13), 0 1px 4px rgba(0,0,0,0.08);
+    background: #fff;
+  }
+  .browser-bar {
+    background: #ececec;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid #d9d9d9;
+  }
+  .browser-dots { display: flex; gap: 6px; }
+  .browser-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+  }
+  .dot-red { background: #ff5f57; }
+  .dot-yellow { background: #febc2e; }
+  .dot-green { background: #28c840; }
+  .browser-url {
+    flex: 1;
+    background: #fff;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: #6b6b6b;
+    font-family: 'SF Mono', 'Menlo', monospace;
+  }
+
+  /* ─── App Shell ─────────────────────────────────────────────────────── */
+  .app-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 600px;
+  }
+
+  /* ─── Top Nav ───────────────────────────────────────────────────────── */
+  .top-nav {
+    height: 52px;
+    background: #fff;
+    border-bottom: 1px solid #e5e5e5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+  .intuit-logo {
+    font-size: 22px;
+    font-weight: 800;
+    color: #2d2d2d;
+    letter-spacing: -0.5px;
+  }
+  .intuit-logo span { color: #2ca01c; }
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .nav-icon-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: #6b6b6b;
+    position: relative;
+    transition: background 0.15s;
+  }
+  .nav-icon-btn:hover { background: #f4f4f6; }
+  .nav-icon-btn svg { width: 20px; height: 20px; }
+  .notif-badge {
+    position: absolute;
+    top: 5px; right: 5px;
+    width: 8px; height: 8px;
+    background: #D0021B;
+    border-radius: 50%;
+    border: 1.5px solid #fff;
+  }
+  .nav-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: #0077C5;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+
+  /* ─── Body Layout ───────────────────────────────────────────────────── */
+  .app-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ─── Sidebar ───────────────────────────────────────────────────────── */
+  .sidebar {
+    width: 200px;
+    background: #fff;
+    border-right: 1px solid #e5e5e5;
+    padding: 20px 0;
+    flex-shrink: 0;
+  }
+  .sidebar-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #6b6b6b;
+    padding: 0 16px;
+    margin-bottom: 8px;
+    margin-top: 16px;
+  }
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 16px;
+    font-size: 13px;
+    color: #2d2d2d;
+    cursor: pointer;
+    transition: background 0.12s;
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    font-weight: 500;
+  }
+  .sidebar-item:hover { background: #f4f4f6; }
+  .sidebar-item.active {
+    border-left: 3px solid #0077C5;
+    background: #e8f4fb;
+    color: #0077C5;
+    font-weight: 700;
+  }
+  .sidebar-item svg { width: 16px; height: 16px; opacity: 0.7; }
+  .sidebar-item.active svg { opacity: 1; }
+
+  /* ─── Main Content ──────────────────────────────────────────────────── */
+  .main-content {
+    flex: 1;
+    padding: 0 40px 60px;
+    background: #fafafa;
+    overflow-y: auto;
+  }
+  .page-header {
+    padding: 24px 0 16px;
+    border-bottom: 1px solid #e5e5e5;
+    margin-bottom: 24px;
+  }
+  .page-header h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #2d2d2d;
+  }
+  .page-header p {
+    font-size: 13px;
+    color: #6b6b6b;
+    margin-top: 4px;
+  }
+
+  /* ─── Cards ─────────────────────────────────────────────────────────── */
+  .card {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #2d2d2d;
+    margin-bottom: 4px;
+  }
+  .card-subtitle {
+    font-size: 12px;
+    color: #6b6b6b;
+    margin-bottom: 16px;
+  }
+
+  /* ─── Banners ────────────────────────────────────────────────────────── */
+  .banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    border-left: 4px solid;
+  }
+  .banner-warning {
+    background: #FFF8E7;
+    border-color: #F5A623;
+  }
+  .banner-critical {
+    background: #FEF0F0;
+    border-color: #D0021B;
+  }
+  .banner-success {
+    background: #f0faf0;
+    border-color: #2ca01c;
+  }
+  .banner-info {
+    background: #e8f4fb;
+    border-color: #0077C5;
+  }
+  .banner-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .banner-body { flex: 1; }
+  .banner-title { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .banner-text { font-size: 13px; color: #2d2d2d; }
+  .banner-actions { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+  .banner-dismiss {
+    background: none; border: none; cursor: pointer;
+    color: #6b6b6b; font-size: 18px; line-height: 1;
+    flex-shrink: 0; padding: 2px;
+    align-self: flex-start;
+    transition: color 0.15s;
+  }
+  .banner-dismiss:hover { color: #2d2d2d; }
+
+  /* ─── Buttons ────────────────────────────────────────────────────────── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.15s;
+    font-family: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .btn-primary {
+    background: #0077C5;
+    color: #fff;
+    border-color: #0077C5;
+  }
+  .btn-primary:hover { background: #005ea3; border-color: #005ea3; }
+  .btn-secondary {
+    background: #fff;
+    color: #0077C5;
+    border-color: #0077C5;
+  }
+  .btn-secondary:hover { background: #e8f4fb; }
+  .btn-danger {
+    background: #D0021B;
+    color: #fff;
+    border-color: #D0021B;
+  }
+  .btn-danger:hover { background: #a80016; }
+  .btn-dismiss {
+    background: none;
+    color: #6b6b6b;
+    border: none;
+    padding: 9px 12px;
+  }
+  .btn-dismiss:hover { color: #2d2d2d; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  /* ─── Badges ─────────────────────────────────────────────────────────── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+  .badge-action-needed { background: #FFF8E7; color: #b57a00; border: 1px solid #F5A623; }
+  .badge-restricted { background: #FEF0F0; color: #D0021B; border: 1px solid #D0021B; }
+  .badge-secure { background: #f0faf0; color: #1a7a0e; border: 1px solid #2ca01c; }
+  .badge-medium { background: #fff3e0; color: #e65c00; border: 1px solid #F5A623; }
+  .badge-high { background: #FEF0F0; color: #D0021B; border: 1px solid #D0021B; }
+  .badge-info { background: #e8f4fb; color: #0077C5; border: 1px solid #0077C5; }
+
+  /* ─── Security Score ─────────────────────────────────────────────────── */
+  .score-ring-wrap {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .score-ring {
+    width: 90px; height: 90px;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .score-ring svg { width: 90px; height: 90px; transform: rotate(-90deg); }
+  .score-ring-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .score-number {
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .score-total {
+    font-size: 11px;
+    color: #6b6b6b;
+  }
+  .score-info {}
+  .score-level {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .score-desc { font-size: 12px; color: #6b6b6b; }
+
+  /* ─── Checklist ──────────────────────────────────────────────────────── */
+  .checklist { list-style: none; }
+  .checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 13px;
+  }
+  .checklist-item:last-child { border-bottom: none; }
+  .check-icon {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    margin-top: 1px;
+  }
+  .check-done { background: #e6f9e6; color: #2ca01c; }
+  .check-warn { background: #FFF8E7; color: #F5A623; }
+  .check-fail { background: #FEF0F0; color: #D0021B; }
+  .check-label { font-weight: 600; }
+  .check-detail { font-size: 12px; color: #6b6b6b; margin-top: 2px; }
+  .check-action { margin-top: 4px; }
+
+  /* ─── Chatbot Panel ──────────────────────────────────────────────────── */
+  .chat-panel {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    animation: dropIn 0.3s ease;
+  }
+  .chat-header {
+    background: #0077C5;
+    color: #fff;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .chat-avatar {
+    width: 32px; height: 32px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .chat-header-info {}
+  .chat-header-name { font-size: 14px; font-weight: 700; }
+  .chat-header-status { font-size: 11px; opacity: 0.8; }
+  .chat-close {
+    margin-left: auto;
+    background: none; border: none;
+    color: rgba(255,255,255,0.8);
+    font-size: 20px; cursor: pointer;
+    line-height: 1;
+    transition: color 0.15s;
+  }
+  .chat-close:hover { color: #fff; }
+  .chat-body {
+    padding: 16px;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #f9fafb;
+    min-height: 260px;
+  }
+  .chat-msg {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    animation: dropIn 0.25s ease;
+  }
+  .chat-msg-bot { align-self: flex-start; }
+  .chat-msg-user { align-self: flex-end; flex-direction: row-reverse; }
+  .bot-avatar {
+    width: 28px; height: 28px;
+    background: #0077C5;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .msg-bubble {
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 85%;
+  }
+  .msg-bubble-bot {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-top-left-radius: 2px;
+    color: #2d2d2d;
+  }
+  .msg-bubble-user {
+    background: #0077C5;
+    color: #fff;
+    border-top-right-radius: 2px;
+  }
+  .chat-footer {
+    padding: 14px 16px;
+    border-top: 1px solid #e5e5e5;
+    background: #fff;
+    flex-shrink: 0;
+  }
+  .chat-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .chat-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.12s;
+    background: #fafafa;
+  }
+  .chat-checkbox-label:hover { border-color: #0077C5; background: #e8f4fb; }
+  .chat-checkbox-label.checked {
+    border-color: #0077C5;
+    background: #e8f4fb;
+    color: #0077C5;
+    font-weight: 600;
+  }
+  .chat-checkbox-label input { display: none; }
+  .chat-check-box {
+    width: 16px; height: 16px;
+    border: 2px solid #c0c0c0;
+    border-radius: 3px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    transition: all 0.12s;
+  }
+  .checked .chat-check-box {
+    background: #0077C5;
+    border-color: #0077C5;
+    color: #fff;
+  }
+  .chat-actions { display: flex; gap: 8px; margin-top: 12px; }
+
+  /* ─── Two-column Layout ───────────────────────────────────────────────── */
+  .two-col { display: grid; grid-template-columns: 1fr 360px; gap: 20px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  /* ─── Progress Bar ────────────────────────────────────────────────────── */
+  .progress-bar-wrap {
+    background: #e5e5e5;
+    border-radius: 100px;
+    height: 6px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    background: #0077C5;
+    transition: width 0.4s ease;
+  }
+  .progress-label {
+    font-size: 12px;
+    color: #6b6b6b;
+    margin-bottom: 16px;
+  }
+
+  /* ─── Step Checklist ─────────────────────────────────────────────────── */
+  .step-list { list-style: none; }
+  .step-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .step-number {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: #e5e5e5;
+    color: #6b6b6b;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: all 0.2s;
+  }
+  .step-item.active .step-number {
+    background: #0077C5;
+    color: #fff;
+  }
+  .step-item.done .step-number {
+    background: #2ca01c;
+    color: #fff;
+  }
+  .step-body { flex: 1; }
+  .step-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #2d2d2d;
+  }
+  .step-item.pending .step-title { color: #6b6b6b; }
+  .step-desc { font-size: 12px; color: #6b6b6b; }
+
+  /* ─── Password Form ───────────────────────────────────────────────────── */
+  .form-group { margin-bottom: 14px; }
+  .form-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #2d2d2d;
+    margin-bottom: 5px;
+  }
+  .form-input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    color: #2d2d2d;
+    background: #fff;
+    transition: border-color 0.15s;
+    outline: none;
+  }
+  .form-input:focus { border-color: #0077C5; box-shadow: 0 0 0 3px rgba(0,119,197,0.12); }
+  .form-hint { font-size: 11px; color: #6b6b6b; margin-top: 4px; }
+  .pw-strength {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+  }
+  .pw-bar {
+    height: 4px;
+    flex: 1;
+    border-radius: 2px;
+    background: #e5e5e5;
+  }
+  .pw-bar.fill-red { background: #D0021B; }
+  .pw-bar.fill-yellow { background: #F5A623; }
+  .pw-bar.fill-green { background: #2ca01c; }
+
+  /* ─── Action Path Cards ──────────────────────────────────────────────── */
+  .action-path-card {
+    border: 2px solid #e5e5e5;
+    border-radius: 10px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #fff;
+    position: relative;
+  }
+  .action-path-card:hover, .action-path-card.hovered {
+    border-color: #0077C5;
+    box-shadow: 0 4px 16px rgba(0,119,197,0.12);
+    transform: translateY(-1px);
+  }
+  .action-path-card.recommended::before {
+    content: 'Recommended';
+    position: absolute;
+    top: -10px; left: 14px;
+    background: #0077C5;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 100px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+  .action-path-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #2d2d2d;
+  }
+  .action-path-desc { font-size: 12px; color: #6b6b6b; line-height: 1.4; }
+  .action-path-icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  /* ─── Escalation Form ────────────────────────────────────────────────── */
+  .report-form-card {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  /* ─── Case Success ───────────────────────────────────────────────────── */
+  .case-number {
+    font-family: 'SF Mono', 'Menlo', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: #0077C5;
+    letter-spacing: 1px;
+  }
+
+  /* ─── Next Steps ─────────────────────────────────────────────────────── */
+  .next-steps { list-style: none; }
+  .next-step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 13px;
+  }
+  .next-step-item:last-child { border-bottom: none; }
+  .next-step-dot {
+    width: 8px; height: 8px;
+    background: #0077C5;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+
+  /* ─── Animations ─────────────────────────────────────────────────────── */
+  @keyframes dropIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  @keyframes slideInRight {
+    from { opacity: 0; transform: translateX(30px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  /* ─── Modal ──────────────────────────────────────────────────────────── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .modal-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .modal {
+    background: #fff;
+    border-radius: 12px;
+    padding: 32px;
+    max-width: 480px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    animation: modalIn 0.25s ease;
+  }
+  .modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .modal-body { font-size: 13px; color: #6b6b6b; margin-bottom: 20px; line-height: 1.6; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+  /* ─── Figma Spec ─────────────────────────────────────────────────────── */
+  .figma-spec {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    border-radius: 12px;
+    padding: 40px;
+    margin-top: 64px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .figma-spec h2 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #cba6f7;
+    margin-bottom: 6px;
+  }
+  .figma-spec .spec-subtitle {
+    color: #6c7086;
+    margin-bottom: 32px;
+    font-size: 13px;
+  }
+  .figma-spec h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #89b4fa;
+    margin-top: 32px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #313244;
+    padding-bottom: 6px;
+  }
+  .figma-spec h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #a6e3a1;
+    margin-top: 16px;
+    margin-bottom: 6px;
+  }
+  .figma-spec p { margin-bottom: 10px; color: #bac2de; }
+  .figma-spec ul, .figma-spec ol { padding-left: 20px; margin-bottom: 10px; }
+  .figma-spec li { margin-bottom: 4px; color: #bac2de; }
+  .spec-screen-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  .spec-screen-card {
+    background: #313244;
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .spec-screen-number {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #cba6f7;
+    margin-bottom: 4px;
+  }
+  .spec-screen-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #cdd6f4;
+    margin-bottom: 6px;
+  }
+  .spec-screen-desc { font-size: 12px; color: #9399b2; line-height: 1.5; }
+  .color-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+  }
+  .color-table th {
+    text-align: left;
+    padding: 8px 12px;
+    background: #313244;
+    color: #89b4fa;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .color-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #313244;
+    font-size: 12px;
+    color: #bac2de;
+  }
+  .color-swatch {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border-radius: 3px;
+    vertical-align: middle;
+    margin-right: 6px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .copy-string {
+    background: #313244;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    font-size: 12px;
+  }
+  .copy-key {
+    color: #f38ba8;
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 3px;
+  }
+  .copy-val { color: #a6e3a1; font-style: italic; }
+  .component-pill {
+    display: inline-block;
+    background: #45475a;
+    color: #cdd6f4;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 11px;
+    margin: 2px;
+  }
+  .spec-divider {
+    height: 1px;
+    background: #313244;
+    margin: 24px 0;
+  }
+
+  /* ─── Utility ─────────────────────────────────────────────────────────── */
+  .flex { display: flex; }
+  .flex-col { flex-direction: column; }
+  .gap-8 { gap: 8px; }
+  .gap-12 { gap: 12px; }
+  .gap-16 { gap: 16px; }
+  .items-center { align-items: center; }
+  .items-start { align-items: flex-start; }
+  .justify-between { justify-content: space-between; }
+  .justify-end { justify-content: flex-end; }
+  .mt-4 { margin-top: 4px; }
+  .mt-8 { margin-top: 8px; }
+  .mt-12 { margin-top: 12px; }
+  .mt-16 { margin-top: 16px; }
+  .mt-24 { margin-top: 24px; }
+  .mb-8 { margin-bottom: 8px; }
+  .mb-16 { margin-bottom: 16px; }
+  .mb-24 { margin-bottom: 24px; }
+  .text-muted { color: #6b6b6b; }
+  .text-sm { font-size: 12px; }
+  .text-xs { font-size: 11px; }
+  .text-red { color: #D0021B; }
+  .text-green { color: #2ca01c; }
+  .text-blue { color: #0077C5; }
+  .text-orange { color: #e65c00; }
+  .font-bold { font-weight: 700; }
+  .w-full { width: 100%; }
+  .hidden { display: none !important; }
+
+  /* ─── Interactive States ───────────────────────────────────────────────── */
+  .screen-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .screen-tab {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid #e5e5e5;
+    background: #fff;
+    color: #6b6b6b;
+    transition: all 0.15s;
+  }
+  .screen-tab:hover { border-color: #0077C5; color: #0077C5; }
+  .screen-tab.active {
+    background: #0077C5;
+    color: #fff;
+    border-color: #0077C5;
+  }
+
+  /* Hover state for action path */
+  .action-path-card.hovered .action-path-title { color: #0077C5; }
+
+  /* Active step expanded panel */
+  .step-expanded {
+    background: #f0f7ff;
+    border: 1px solid #c0dff5;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 10px;
+  }
+
+  /* MFA illustration */
+  .mfa-phone {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #f9fafb;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 13px;
+  }
+  .mfa-phone-icon { font-size: 28px; }
+
+  /* Connected app item */
+  .app-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 13px;
+  }
+  .app-row:last-child { border-bottom: none; }
+  .app-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    background: #f4f4f6;
+  }
+  .app-info { flex: 1; }
+  .app-name { font-weight: 600; }
+  .app-detail { font-size: 11px; color: #6b6b6b; }
+
+  /* Stat mini cards */
+  .stat-mini {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 14px 16px;
+    text-align: center;
+  }
+  .stat-mini-num {
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-mini-label { font-size: 11px; color: #6b6b6b; }
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     PROTOTYPE PAGE WRAPPER
+══════════════════════════════════════════════════════════════════════════════ -->
+<div class="prototype-page">
+
+  <!-- Header -->
+  <div class="prototype-header">
+    <div class="feature-tag">Intuit Security Center · CAS Flow</div>
+    <h1>Customer Self-Reporting & Self-Remediation</h1>
+    <p>Interactive prototype — 6 screens · Click through the flow using in-screen buttons</p>
+  </div>
+
+  <!-- Quick Nav -->
+  <div class="screen-tabs" id="screenTabs">
+    <button class="screen-tab active" onclick="scrollToScreen(1)">Screen 1 — Overview</button>
+    <button class="screen-tab" onclick="scrollToScreen(2)">Screen 2 — Questionnaire</button>
+    <button class="screen-tab" onclick="scrollToScreen(3)">Screen 3 — Risk Assessment</button>
+    <button class="screen-tab" onclick="scrollToScreen(4)">Screen 4 — Self-Remediation</button>
+    <button class="screen-tab" onclick="scrollToScreen(5)">Screen 5 — Escalation</button>
+    <button class="screen-tab" onclick="scrollToScreen(6)">Screen 6 — Post-Remediation</button>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       SCREEN 1 — Security Center Overview
+  ══════════════════════════════════════════════════════════════════════ -->
+  <div class="screen-wrapper" id="screen1">
+    <div class="proto-label">
+      <strong>Screen 1 — Security Center Overview</strong>
+      <span>Account Security Score: 45/100 (Critical). Suspicious activity detected banner visible. Self-report CTA prominent.</span>
+    </div>
+    <div class="browser">
+      <div class="browser-bar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-url">accounts.intuit.com/app/security-center</div>
+      </div>
+      <div class="app-shell">
+        <!-- Top Nav -->
+        <nav class="top-nav">
+          <span class="intuit-logo">intui<span>t</span></span>
+          <div class="nav-right">
+            <button class="nav-icon-btn" title="Search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            </button>
+            <button class="nav-icon-btn" title="Notifications">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <span class="notif-badge"></span>
+            </button>
+            <div class="nav-avatar">MR</div>
+          </div>
+        </nav>
+        <!-- App Body -->
+        <div class="app-body">
+          <!-- Sidebar -->
+          <aside class="sidebar">
+            <div class="sidebar-section-label">Account</div>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              Overview
+            </a>
+            <a class="sidebar-item active" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Security Center
+            </a>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              Connected Apps
+            </a>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 8v4l3 3"/></svg>
+              Privacy
+            </a>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              Notifications
+            </a>
+          </aside>
+          <!-- Main Content -->
+          <main class="main-content">
+            <div class="page-header">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h2>Security Center</h2>
+                  <p>Monitor and improve your account security</p>
+                </div>
+                <div class="flex gap-8">
+                  <button class="btn btn-secondary btn-sm">View Activity Log</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Critical Banner -->
+            <div class="banner banner-critical" id="s1-banner">
+              <div class="banner-icon">⚠️</div>
+              <div class="banner-body">
+                <div class="banner-title">We've detected suspicious activity on your account</div>
+                <div class="banner-text">An unrecognized login attempt was made from Chicago, IL on April 2, 2026 at 11:47 PM. Your account may be at risk.</div>
+                <div class="banner-actions">
+                  <button class="btn btn-danger btn-sm" onclick="scrollToScreen(2)">Report Suspicious Activity</button>
+                  <button class="btn btn-dismiss btn-sm">Dismiss</button>
+                </div>
+              </div>
+              <button class="banner-dismiss" onclick="document.getElementById('s1-banner').style.display='none'">×</button>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="three-col mb-16">
+              <div class="stat-mini">
+                <div class="stat-mini-num text-red">45</div>
+                <div class="stat-mini-label">Security Score</div>
+              </div>
+              <div class="stat-mini">
+                <div class="stat-mini-num" style="color:#F5A623">3</div>
+                <div class="stat-mini-label">Issues Detected</div>
+              </div>
+              <div class="stat-mini">
+                <div class="stat-mini-num text-blue">2</div>
+                <div class="stat-mini-label">Apps Connected</div>
+              </div>
+            </div>
+
+            <div class="two-col">
+              <!-- Left Column -->
+              <div>
+                <!-- Security Score Card -->
+                <div class="card">
+                  <div class="flex items-center justify-between mb-16">
+                    <div>
+                      <div class="card-title">Account Security Score</div>
+                      <div class="card-subtitle">Last updated just now</div>
+                    </div>
+                    <span class="badge badge-restricted">Critical</span>
+                  </div>
+                  <div class="score-ring-wrap">
+                    <div class="score-ring">
+                      <svg viewBox="0 0 90 90">
+                        <circle cx="45" cy="45" r="38" fill="none" stroke="#f0f0f0" stroke-width="8"/>
+                        <circle cx="45" cy="45" r="38" fill="none" stroke="#D0021B" stroke-width="8"
+                          stroke-dasharray="238.76" stroke-dashoffset="131.3" stroke-linecap="round"/>
+                      </svg>
+                      <div class="score-ring-text">
+                        <span class="score-number text-red">45</span>
+                        <span class="score-total">/100</span>
+                      </div>
+                    </div>
+                    <div class="score-info">
+                      <div class="score-level text-red">Critical — Immediate Action Required</div>
+                      <div class="score-desc">Your account has multiple security vulnerabilities. Resolve issues below to increase your score.</div>
+                      <div class="mt-12">
+                        <button class="btn btn-danger btn-sm" onclick="scrollToScreen(2)">
+                          Report Suspicious Activity
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Security Checklist Card -->
+                <div class="card">
+                  <div class="card-title">Security Checklist</div>
+                  <div class="card-subtitle">3 items need your attention</div>
+                  <ul class="checklist">
+                    <li class="checklist-item">
+                      <div class="check-icon check-warn">!</div>
+                      <div>
+                        <div class="check-label">Password last changed 8 months ago</div>
+                        <div class="check-detail">Passwords should be updated every 90 days for best protection</div>
+                        <div class="check-action mt-4">
+                          <button class="btn btn-secondary btn-sm">Update Password</button>
+                        </div>
+                      </div>
+                    </li>
+                    <li class="checklist-item">
+                      <div class="check-icon check-fail">✕</div>
+                      <div>
+                        <div class="check-label">2-Step Verification not enabled</div>
+                        <div class="check-detail">Enable MFA to prevent unauthorized access even if your password is compromised</div>
+                        <div class="check-action mt-4">
+                          <button class="btn btn-secondary btn-sm">Enable MFA</button>
+                        </div>
+                      </div>
+                    </li>
+                    <li class="checklist-item">
+                      <div class="check-icon check-fail">✕</div>
+                      <div>
+                        <div class="check-label">Unrecognized login from Chicago, IL</div>
+                        <div class="check-detail">April 2, 2026 · 11:47 PM · IP 64.182.xxx.xxx</div>
+                        <div class="check-action mt-4">
+                          <button class="btn btn-danger btn-sm" onclick="scrollToScreen(2)">Report This Activity</button>
+                        </div>
+                      </div>
+                    </li>
+                    <li class="checklist-item">
+                      <div class="check-icon check-done">✓</div>
+                      <div>
+                        <div class="check-label">Recovery email verified</div>
+                        <div class="check-detail">mridula••••@gmail.com — verified 2 days ago</div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Right Column -->
+              <div>
+                <!-- Recent Activity Card -->
+                <div class="card">
+                  <div class="card-title">Recent Account Activity</div>
+                  <div class="card-subtitle">Last 7 days</div>
+                  <div style="margin-top:8px;">
+                    <div class="app-row">
+                      <div class="app-icon" style="background:#FEF0F0; font-size:14px;">⚠️</div>
+                      <div class="app-info">
+                        <div class="app-name" style="color:#D0021B">Suspicious Login Attempt</div>
+                        <div class="app-detail">Chicago, IL · Apr 2 · 11:47 PM</div>
+                      </div>
+                      <span class="badge badge-restricted" style="font-size:10px;">Review</span>
+                    </div>
+                    <div class="app-row">
+                      <div class="app-icon" style="background:#e8f4fb; font-size:14px;">💻</div>
+                      <div class="app-info">
+                        <div class="app-name">Login — MacBook Pro</div>
+                        <div class="app-detail">San Jose, CA · Apr 2 · 9:15 AM</div>
+                      </div>
+                      <span class="badge badge-secure" style="font-size:10px;">You</span>
+                    </div>
+                    <div class="app-row">
+                      <div class="app-icon" style="background:#fff3e0; font-size:14px;">💳</div>
+                      <div class="app-info">
+                        <div class="app-name">QuickBooks — $2,340.00 txn</div>
+                        <div class="app-detail">Apr 1 · Unfamiliar vendor</div>
+                      </div>
+                      <span class="badge badge-action-needed" style="font-size:10px;">Check</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Proactive Tip Card -->
+                <div class="card" style="border-left: 4px solid #0077C5;">
+                  <div class="flex gap-8 items-start">
+                    <div style="font-size:20px; margin-top:2px;">💡</div>
+                    <div>
+                      <div class="card-title text-blue mb-8">Security Tip</div>
+                      <div class="text-sm" style="color:#2d2d2d; line-height:1.6;">
+                        Enabling 2-step verification can increase your security score by <strong>+22 points</strong> and blocks 99.9% of automated attack attempts.
+                      </div>
+                      <button class="btn btn-primary btn-sm mt-12">Enable Now</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Report CTA Card -->
+                <div class="card" style="background: linear-gradient(135deg, #fff5f5 0%, #fff0f0 100%); border-color: #ffcccc;">
+                  <div style="font-size:28px; margin-bottom:10px;">🔒</div>
+                  <div class="card-title mb-8">Think your account was compromised?</div>
+                  <p class="text-sm text-muted" style="margin-bottom:14px;">Our AI-powered self-service lets you report suspicious activity and secure your account in minutes — no phone call needed.</p>
+                  <button class="btn btn-danger w-full" onclick="scrollToScreen(2)" style="justify-content:center;">
+                    Report Suspicious Activity
+                  </button>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       SCREEN 2 — Intuit Assist: Suspicious Activity Questionnaire
+  ══════════════════════════════════════════════════════════════════════ -->
+  <div class="screen-wrapper" id="screen2">
+    <div class="proto-label">
+      <strong>Screen 2 — Intuit Assist: Suspicious Activity Questionnaire</strong>
+      <span>Intuit Assist chat panel open. Bot presents the initial questionnaire. User has selected 2 options.</span>
+    </div>
+    <div class="browser">
+      <div class="browser-bar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-url">accounts.intuit.com/app/security-center · Intuit Assist</div>
+      </div>
+      <div class="app-shell">
+        <nav class="top-nav">
+          <span class="intuit-logo">intui<span>t</span></span>
+          <div class="nav-right">
+            <button class="nav-icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            </button>
+            <button class="nav-icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <span class="notif-badge"></span>
+            </button>
+            <div class="nav-avatar">MR</div>
+          </div>
+        </nav>
+        <div class="app-body">
+          <aside class="sidebar">
+            <div class="sidebar-section-label">Account</div>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              Overview
+            </a>
+            <a class="sidebar-item active" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Security Center
+            </a>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              Connected Apps
+            </a>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 8v4l3 3"/></svg>
+              Privacy
+            </a>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              Notifications
+            </a>
+          </aside>
+          <main class="main-content" style="position:relative;">
+            <div class="page-header">
+              <h2>Security Center</h2>
+              <p>Monitor and improve your account security</p>
+            </div>
+
+            <!-- Dimmed background content -->
+            <div style="opacity:0.35; pointer-events:none;">
+              <div class="card">
+                <div class="score-ring-wrap">
+                  <div class="score-ring" style="width:60px;height:60px;">
+                    <svg viewBox="0 0 90 90" width="60" height="60">
+                      <circle cx="45" cy="45" r="38" fill="none" stroke="#f0f0f0" stroke-width="8"/>
+                      <circle cx="45" cy="45" r="38" fill="none" stroke="#D0021B" stroke-width="8" stroke-dasharray="238.76" stroke-dashoffset="131.3" stroke-linecap="round"/>
+                    </svg>
+                    <div class="score-ring-text">
+                      <span class="score-number text-red" style="font-size:16px">45</span>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="font-bold">Account Security Score · Critical</div>
+                    <div class="text-sm text-muted">3 issues detected</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Intuit Assist Panel Overlay -->
+            <div style="position:absolute; inset:0; display:flex; align-items:flex-start; justify-content:flex-end; padding:20px; background:rgba(0,0,0,0.08); z-index:5;">
+              <div class="chat-panel" style="width:380px; animation:slideInRight 0.3s ease;">
+                <div class="chat-header">
+                  <div class="chat-avatar">✦</div>
+                  <div class="chat-header-info">
+                    <div class="chat-header-name">Intuit Assist</div>
+                    <div class="chat-header-status">● Online · Powered by AI</div>
+                  </div>
+                  <button class="chat-close" onclick="scrollToScreen(1)">×</button>
+                </div>
+                <div class="chat-body">
+                  <div class="chat-msg chat-msg-bot">
+                    <div class="bot-avatar">IA</div>
+                    <div class="msg-bubble msg-bubble-bot">
+                      Hi Mridula, I'm here to help keep your account safe. 🛡️<br><br>
+                      I noticed some unusual activity on your account. Let's figure out what happened together — this will only take a few minutes.
+                    </div>
+                  </div>
+                  <div class="chat-msg chat-msg-bot">
+                    <div class="bot-avatar">IA</div>
+                    <div class="msg-bubble msg-bubble-bot">
+                      <strong>Have you noticed any of the following?</strong><br>
+                      <span style="font-size:12px; color:#6b6b6b;">Select all that apply</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="chat-footer">
+                  <div class="chat-options" id="s2-options">
+                    <label class="chat-checkbox-label checked" id="s2-opt1" onclick="toggleCheck(this)">
+                      <div class="chat-check-box">✓</div>
+                      <span>Unrecognized login attempt</span>
+                    </label>
+                    <label class="chat-checkbox-label checked" id="s2-opt2" onclick="toggleCheck(this)">
+                      <div class="chat-check-box">✓</div>
+                      <span>Unfamiliar transaction or charge</span>
+                    </label>
+                    <label class="chat-checkbox-label" id="s2-opt3" onclick="toggleCheck(this)">
+                      <div class="chat-check-box"></div>
+                      <span>Changes to my personal info</span>
+                    </label>
+                    <label class="chat-checkbox-label" id="s2-opt4" onclick="toggleCheck(this)">
+                      <div class="chat-check-box"></div>
+                      <span>Unrecognized connected app</span>
+                    </label>
+                  </div>
+                  <div class="chat-actions">
+                    <button class="btn btn-dismiss btn-sm" onclick="scrollToScreen(1)">Cancel</button>
+                    <button class="btn btn-primary btn-sm" style="margin-left:auto;" onclick="scrollToScreen(3)">
+                      Continue →
+                    </button>
+                  </div>
+                  <div class="text-xs text-muted mt-8" style="text-align:center;">
+                    Your responses are encrypted and secure
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       SCREEN 3 — Intuit Assist: Risk Assessment Result
+  ══════════════════════════════════════════════════════════════════════ -->
+  <div class="screen-wrapper" id="screen3">
+    <div class="proto-label">
+      <strong>Screen 3 — Intuit Assist: Risk Assessment Result</strong>
+      <span>Bot has assessed responses. HIGH risk level shown. User sees two action paths — hovering on primary "Secure my account now".</span>
+    </div>
+    <div class="browser">
+      <div class="browser-bar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-url">accounts.intuit.com/app/security-center · Intuit Assist · Risk Assessment</div>
+      </div>
+      <div class="app-shell">
+        <nav class="top-nav">
+          <span class="intuit-logo">intui<span>t</span></span>
+          <div class="nav-right">
+            <button class="nav-icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            </button>
+            <button class="nav-icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <span class="notif-badge"></span>
+            </button>
+            <div class="nav-avatar">MR</div>
+          </div>
+        </nav>
+        <div class="app-body">
+          <aside class="sidebar">
+            <div class="sidebar-section-label">Account</div>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              Overview
+            </a>
+            <a class="sidebar-item active" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Security Center
+            </a>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              Connected Apps
+            </a>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 8v4l3 3"/></svg>
+              Privacy
+            </a>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              Notifications
+            </a>
+          </aside>
+          <main class="main-content" style="position:relative;">
+            <div class="page-header">
+              <h2>Security Center</h2>
+              <p>Monitor and improve your account security</p>
+            </div>
+
+            <!-- Dimmed background -->
+            <div style="opacity:0.3; pointer-events:none;">
+              <div class="card mb-16"><div class="font-bold text-muted">Account Security Score — Critical (45/100)</div></div>
+            </div>
+
+            <!-- Wider Chat Panel for Risk Result -->
+            <div style="position:absolute; inset:0; display:flex; align-items:flex-start; justify-content:flex-end; padding:20px; background:rgba(0,0,0,0.1); z-index:5;">
+              <div class="chat-panel" style="width:420px; animation:slideInRight 0.3s ease;">
+                <div class="chat-header">
+                  <div class="chat-avatar">✦</div>
+                  <div class="chat-header-info">
+                    <div class="chat-header-name">Intuit Assist</div>
+                    <div class="chat-header-status">● Analyzing your responses...</div>
+                  </div>
+                  <button class="chat-close" onclick="scrollToScreen(1)">×</button>
+                </div>
+                <div class="chat-body" style="min-height:200px;">
+                  <!-- User message -->
+                  <div class="chat-msg chat-msg-user">
+                    <div class="msg-bubble msg-bubble-user">
+                      Unrecognized login attempt, Unfamiliar transaction
+                    </div>
+                    <div class="bot-avatar" style="background:#6b6b6b;">MR</div>
+                  </div>
+
+                  <!-- Bot typing -->
+                  <div class="chat-msg chat-msg-bot">
+                    <div class="bot-avatar">IA</div>
+                    <div class="msg-bubble msg-bubble-bot">
+                      Thank you for sharing that, Mridula. Let me analyze your account activity...
+                    </div>
+                  </div>
+
+                  <!-- Risk Result -->
+                  <div class="chat-msg chat-msg-bot">
+                    <div class="bot-avatar">IA</div>
+                    <div>
+                      <div style="background:#FEF0F0; border:1px solid #D0021B; border-radius:10px; padding:14px; margin-bottom:6px; border-top-left-radius:2px;">
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                          <span style="font-size:20px;">🚨</span>
+                          <div>
+                            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#6b6b6b; margin-bottom:2px;">Account Security Level</div>
+                            <div style="font-size:18px; font-weight:800; color:#D0021B;">HIGH RISK</div>
+                          </div>
+                        </div>
+                        <div style="font-size:12px; color:#2d2d2d; line-height:1.5; border-top:1px solid #f0c0c0; padding-top:8px;">
+                          Based on what you've shared, your account may have been accessed without your permission. I'll help you secure it right now.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="chat-footer">
+                  <div class="text-sm font-bold mb-8" style="color:#2d2d2d;">How would you like to proceed?</div>
+                  <div style="display:flex; flex-direction:column; gap:10px;">
+                    <div class="action-path-card recommended hovered" onclick="scrollToScreen(4)">
+                      <div class="action-path-icon">🛡️</div>
+                      <div class="action-path-title" style="color:#0077C5;">Secure my account now</div>
+                      <div class="action-path-desc">Reset password, enable MFA, and review your activity — guided step by step.</div>
+                      <div class="mt-8">
+                        <span class="badge badge-info" style="font-size:10px;">Takes ~3 minutes</span>
+                      </div>
+                    </div>
+                    <div class="action-path-card" onclick="scrollToScreen(5)">
+                      <div class="action-path-icon">📋</div>
+                      <div class="action-path-title">Report to investigation team</div>
+                      <div class="action-path-desc">Submit a detailed report. Our security team will investigate and follow up within 2 business hours.</div>
+                    </div>
+                  </div>
+                  <div class="mt-12">
+                    <button class="btn btn-dismiss btn-sm" onclick="scrollToScreen(2)">← Back</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       SCREEN 4 — Self-Remediation: Security Checklist
+  ══════════════════════════════════════════════════════════════════════ -->
+  <div class="screen-wrapper" id="screen4">
+    <div class="proto-label">
+      <strong>Screen 4 — Self-Remediation: Security Checklist</strong>
+      <span>Guided remediation flow. Step 1 (Reset Password) active and expanded. Steps 2 & 3 pending. Progress bar shows Step 1 of 3.</span>
+    </div>
+    <div class="browser">
+      <div class="browser-bar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-url">accounts.intuit.com/app/security-center/remediation</div>
+      </div>
+      <div class="app-shell">
+        <nav class="top-nav">
+          <span class="intuit-logo">intui<span>t</span></span>
+          <div class="nav-right">
+            <button class="nav-icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            </button>
+            <button class="nav-icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <span class="notif-badge"></span>
+            </button>
+            <div class="nav-avatar">MR</div>
+          </div>
+        </nav>
+        <div class="app-body">
+          <aside class="sidebar">
+            <div class="sidebar-section-label">Account</div>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              Overview
+            </a>
+            <a class="sidebar-item active" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Security Center
+            </a>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              Connected Apps
+            </a>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 8v4l3 3"/></svg>
+              Privacy
+            </a>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              Notifications
+            </a>
+          </aside>
+          <main class="main-content">
+            <!-- Empathetic Header -->
+            <div style="padding:24px 0 8px;">
+              <div class="flex items-center gap-12 mb-16">
+                <button class="btn btn-dismiss btn-sm" onclick="scrollToScreen(3)" style="padding:6px 0;">← Back</button>
+              </div>
+              <div style="background:linear-gradient(135deg, #e8f4fb, #f0f7ff); border-radius:12px; padding:20px 24px; margin-bottom:24px; border:1px solid #c0dff5;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                  <div style="font-size:32px;">🛡️</div>
+                  <div>
+                    <div style="font-size:18px; font-weight:700; color:#0077C5; margin-bottom:4px;">You're doing great. Let's secure your account step by step.</div>
+                    <div class="text-sm text-muted">This takes about 3 minutes. We'll guide you through each step.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="two-col" style="grid-template-columns: 1fr 320px;">
+              <!-- Left: Steps -->
+              <div>
+                <!-- Progress -->
+                <div class="mb-24">
+                  <div class="flex items-center justify-between mb-8">
+                    <div class="text-sm font-bold" style="color:#0077C5;">Step 1 of 3</div>
+                    <div class="text-xs text-muted">~2 min remaining</div>
+                  </div>
+                  <div class="progress-bar-wrap">
+                    <div class="progress-bar-fill" style="width:33.3%;"></div>
+                  </div>
+                </div>
+
+                <!-- Step 1: Reset Password — Active -->
+                <div class="card" style="border-color:#0077C5; border-width:2px;">
+                  <div class="step-item active" style="margin-bottom:0;">
+                    <div class="step-number">1</div>
+                    <div class="step-body">
+                      <div class="step-title">Reset your password</div>
+                      <div class="step-desc">Create a strong new password to block any unauthorized access</div>
+                    </div>
+                    <span class="badge badge-info" style="font-size:10px; flex-shrink:0;">In Progress</span>
+                  </div>
+                  <!-- Expanded Content -->
+                  <div class="step-expanded mt-12">
+                    <div class="form-group">
+                      <label class="form-label">New Password</label>
+                      <input type="password" class="form-input" value="••••••••••••" placeholder="Enter new password">
+                      <div class="pw-strength mt-8">
+                        <div class="pw-bar fill-green"></div>
+                        <div class="pw-bar fill-green"></div>
+                        <div class="pw-bar fill-green"></div>
+                        <div class="pw-bar"></div>
+                      </div>
+                      <div class="form-hint mt-4" style="color:#2ca01c;">Strong — Great choice!</div>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Confirm New Password</label>
+                      <input type="password" class="form-input" value="••••••••••••" placeholder="Confirm new password">
+                    </div>
+                    <div style="background:#fff; border:1px solid #e5e5e5; border-radius:6px; padding:10px; margin-top:4px;">
+                      <div class="text-xs font-bold mb-4" style="color:#2d2d2d;">Password requirements:</div>
+                      <div class="text-xs" style="color:#2ca01c;">✓ At least 8 characters</div>
+                      <div class="text-xs" style="color:#2ca01c;">✓ Upper and lowercase letters</div>
+                      <div class="text-xs" style="color:#2ca01c;">✓ At least one number</div>
+                      <div class="text-xs" style="color:#6b6b6b;">○ At least one special character</div>
+                    </div>
+                    <div class="flex gap-8 mt-16">
+                      <button class="btn btn-primary btn-sm" onclick="scrollToScreen(6)">Save Password & Continue →</button>
+                      <button class="btn btn-dismiss btn-sm">Skip for now</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Step 2: MFA — Pending -->
+                <div class="card" style="opacity:0.7;">
+                  <div class="step-item pending" style="margin-bottom:0;">
+                    <div class="step-number">2</div>
+                    <div class="step-body">
+                      <div class="step-title">Enable 2-step verification</div>
+                      <div class="step-desc">Add a second layer of protection with SMS or authenticator app</div>
+                    </div>
+                    <span class="badge badge-action-needed" style="font-size:10px; flex-shrink:0;">Pending</span>
+                  </div>
+                </div>
+
+                <!-- Step 3: Review Activity — Pending -->
+                <div class="card" style="opacity:0.7;">
+                  <div class="step-item pending" style="margin-bottom:0;">
+                    <div class="step-number">3</div>
+                    <div class="step-body">
+                      <div class="step-title">Review recent account activity</div>
+                      <div class="step-desc">Confirm which logins and transactions were you</div>
+                    </div>
+                    <span class="badge badge-action-needed" style="font-size:10px; flex-shrink:0;">Pending</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: Assist Panel -->
+              <div>
+                <div class="card" style="background:#f9fafb;">
+                  <div class="flex items-center gap-8 mb-12">
+                    <div class="bot-avatar" style="width:32px;height:32px; font-size:13px;">IA</div>
+                    <div>
+                      <div class="text-sm font-bold">Intuit Assist</div>
+                      <div class="text-xs text-muted">Here to help</div>
+                    </div>
+                  </div>
+                  <div class="msg-bubble msg-bubble-bot mb-12" style="max-width:100%;">
+                    I'll stay here while you complete each step. Your new password will immediately lock out anyone who may have accessed your account.
+                  </div>
+                  <div class="msg-bubble msg-bubble-bot" style="max-width:100%; background:#FFF8E7; border-color:#F5A623;">
+                    <strong style="color:#b57a00;">💡 Quick tip:</strong>
+                    <div style="font-size:12px; color:#2d2d2d; margin-top:4px;">Don't reuse passwords from other accounts. Consider a password manager like 1Password or Bitwarden.</div>
+                  </div>
+                </div>
+
+                <!-- What happens next -->
+                <div class="card">
+                  <div class="card-title mb-8">After you complete this</div>
+                  <ul class="next-steps">
+                    <li class="next-step-item">
+                      <div class="next-step-dot"></div>
+                      <span>All active sessions will be signed out</span>
+                    </li>
+                    <li class="next-step-item">
+                      <div class="next-step-dot"></div>
+                      <span>A confirmation email will be sent to you</span>
+                    </li>
+                    <li class="next-step-item">
+                      <div class="next-step-dot"></div>
+                      <span>Your Security Score will update immediately</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       SCREEN 5 — ATO Escalation: Report Submitted
+  ══════════════════════════════════════════════════════════════════════ -->
+  <div class="screen-wrapper" id="screen5">
+    <div class="proto-label">
+      <strong>Screen 5 — ATO Escalation: Report Submitted</strong>
+      <span>User chose to report to investigation team. Case #IB-2024-8821 opened. Success state with bot guidance and next steps.</span>
+    </div>
+    <div class="browser">
+      <div class="browser-bar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-url">accounts.intuit.com/app/security-center/report-submitted</div>
+      </div>
+      <div class="app-shell">
+        <nav class="top-nav">
+          <span class="intuit-logo">intui<span>t</span></span>
+          <div class="nav-right">
+            <button class="nav-icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            </button>
+            <button class="nav-icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <span class="notif-badge"></span>
+            </button>
+            <div class="nav-avatar">MR</div>
+          </div>
+        </nav>
+        <div class="app-body">
+          <aside class="sidebar">
+            <div class="sidebar-section-label">Account</div>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              Overview
+            </a>
+            <a class="sidebar-item active" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Security Center
+            </a>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              Connected Apps
+            </a>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 8v4l3 3"/></svg>
+              Privacy
+            </a>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              Notifications
+            </a>
+          </aside>
+          <main class="main-content">
+            <div style="padding:24px 0 0;">
+              <!-- Success Banner -->
+              <div class="banner banner-success" style="animation:dropIn 0.4s ease;">
+                <div class="banner-icon">✅</div>
+                <div class="banner-body">
+                  <div class="banner-title" style="color:#2ca01c;">Your report has been submitted successfully</div>
+                  <div class="banner-text">Case <strong style="font-family:monospace;">#IB-2024-8821</strong> has been opened. Our security team will review your case within 2 business hours.</div>
+                </div>
+              </div>
+
+              <div class="two-col" style="grid-template-columns: 1fr 340px;">
+                <div>
+                  <!-- Case Details Card -->
+                  <div class="card mb-16">
+                    <div class="flex items-center justify-between mb-16">
+                      <div>
+                        <div class="card-title">Investigation Case Opened</div>
+                        <div class="card-subtitle">Submitted April 3, 2026 at 9:14 AM</div>
+                      </div>
+                      <span class="badge badge-info">Under Review</span>
+                    </div>
+                    <div style="background:#f0f7ff; border-radius:8px; padding:16px; margin-bottom:16px;">
+                      <div class="text-xs text-muted mb-4">CASE NUMBER</div>
+                      <div class="case-number">#IB-2024-8821</div>
+                      <div class="text-xs text-muted mt-8">Save this number for your records</div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                      <div style="padding:12px; background:#fafafa; border-radius:6px; border:1px solid #e5e5e5;">
+                        <div class="text-xs text-muted mb-4">Date First Noticed</div>
+                        <div class="text-sm font-bold">April 2, 2026</div>
+                      </div>
+                      <div style="padding:12px; background:#fafafa; border-radius:6px; border:1px solid #e5e5e5;">
+                        <div class="text-xs text-muted mb-4">Current Location</div>
+                        <div class="text-sm font-bold">San Jose, CA</div>
+                      </div>
+                      <div style="padding:12px; background:#fafafa; border-radius:6px; border:1px solid #e5e5e5;">
+                        <div class="text-xs text-muted mb-4">Suspicious Activity</div>
+                        <div class="text-sm font-bold">Login · Transaction</div>
+                      </div>
+                      <div style="padding:12px; background:#fafafa; border-radius:6px; border:1px solid #e5e5e5;">
+                        <div class="text-xs text-muted mb-4">Response SLA</div>
+                        <div class="text-sm font-bold" style="color:#2ca01c;">Within 2 hours</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- What we've done -->
+                  <div class="card mb-16">
+                    <div class="card-title mb-4">Actions taken on your behalf</div>
+                    <div class="card-subtitle">We've already started securing your account</div>
+                    <ul class="checklist">
+                      <li class="checklist-item">
+                        <div class="check-icon check-done">✓</div>
+                        <div>
+                          <div class="check-label">Suspicious session terminated</div>
+                          <div class="check-detail">The unauthorized session from Chicago, IL has been ended</div>
+                        </div>
+                      </li>
+                      <li class="checklist-item">
+                        <div class="check-icon check-done">✓</div>
+                        <div>
+                          <div class="check-label">Suspicious transaction flagged</div>
+                          <div class="check-detail">The $2,340 QuickBooks transaction has been flagged for review</div>
+                        </div>
+                      </li>
+                      <li class="checklist-item">
+                        <div class="check-icon check-done">✓</div>
+                        <div>
+                          <div class="check-label">Confirmation email sent</div>
+                          <div class="check-detail">Case details sent to mridula••••@gmail.com</div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <!-- Next Steps -->
+                  <div class="card">
+                    <div class="card-title mb-4">Recommended next steps</div>
+                    <div class="card-subtitle">While we investigate, here's what you can do</div>
+                    <ul class="next-steps">
+                      <li class="next-step-item">
+                        <div class="next-step-dot" style="background:#D0021B;"></div>
+                        <div>
+                          <div class="font-bold text-sm">Reset your password immediately</div>
+                          <div class="text-xs text-muted">This is the most important step to prevent further unauthorized access</div>
+                          <button class="btn btn-danger btn-sm mt-4">Reset Password</button>
+                        </div>
+                      </li>
+                      <li class="next-step-item">
+                        <div class="next-step-dot" style="background:#F5A623;"></div>
+                        <div>
+                          <div class="font-bold text-sm">Enable 2-step verification</div>
+                          <div class="text-xs text-muted">Add a second layer of security to prevent future unauthorized logins</div>
+                          <button class="btn btn-secondary btn-sm mt-4">Enable MFA</button>
+                        </div>
+                      </li>
+                      <li class="next-step-item">
+                        <div class="next-step-dot"></div>
+                        <div>
+                          <div class="font-bold text-sm">Review connected apps</div>
+                          <div class="text-xs text-muted">Check if any apps were connected without your knowledge</div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <!-- Right: Bot Panel -->
+                <div>
+                  <div class="chat-panel" style="box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
+                    <div class="chat-header">
+                      <div class="chat-avatar">✦</div>
+                      <div class="chat-header-info">
+                        <div class="chat-header-name">Intuit Assist</div>
+                        <div class="chat-header-status">● Case #IB-2024-8821</div>
+                      </div>
+                    </div>
+                    <div class="chat-body" style="min-height:160px;">
+                      <div class="chat-msg chat-msg-bot">
+                        <div class="bot-avatar">IA</div>
+                        <div class="msg-bubble msg-bubble-bot">
+                          Your report is in good hands, Mridula. Our security team will review your case within <strong>2 business hours</strong>.
+                        </div>
+                      </div>
+                      <div class="chat-msg chat-msg-bot">
+                        <div class="bot-avatar">IA</div>
+                        <div class="msg-bubble msg-bubble-bot">
+                          In the meantime, I've already terminated the suspicious session and flagged the unusual transaction. I recommend resetting your password now as an added precaution. 🔒
+                        </div>
+                      </div>
+                      <div class="chat-msg chat-msg-bot">
+                        <div class="bot-avatar">IA</div>
+                        <div class="msg-bubble msg-bubble-bot">
+                          You'll receive updates at <strong>mridula••••@gmail.com</strong>. You can also check case status anytime in Security Center.
+                        </div>
+                      </div>
+                    </div>
+                    <div class="chat-footer">
+                      <button class="btn btn-primary w-full" style="justify-content:center;" onclick="scrollToScreen(6)">
+                        View Security Center →
+                      </button>
+                      <button class="btn btn-dismiss w-full mt-8" style="justify-content:center; font-size:12px;">
+                        Ask Intuit Assist another question
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       SCREEN 6 — Security Center: Post-Remediation State
+  ══════════════════════════════════════════════════════════════════════ -->
+  <div class="screen-wrapper" id="screen6">
+    <div class="proto-label">
+      <strong>Screen 6 — Security Center: Post-Remediation State</strong>
+      <span>Security Score improved to 78/100 (Medium). Password reset ✓, MFA enabled ✓, Case reported ✓. One remaining action: review connected apps.</span>
+    </div>
+    <div class="browser">
+      <div class="browser-bar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-url">accounts.intuit.com/app/security-center</div>
+      </div>
+      <div class="app-shell">
+        <nav class="top-nav">
+          <span class="intuit-logo">intui<span>t</span></span>
+          <div class="nav-right">
+            <button class="nav-icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            </button>
+            <button class="nav-icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </button>
+            <div class="nav-avatar">MR</div>
+          </div>
+        </nav>
+        <div class="app-body">
+          <aside class="sidebar">
+            <div class="sidebar-section-label">Account</div>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              Overview
+            </a>
+            <a class="sidebar-item active" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Security Center
+            </a>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              Connected Apps
+            </a>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 8v4l3 3"/></svg>
+              Privacy
+            </a>
+            <a class="sidebar-item" href="#" onclick="return false;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              Notifications
+            </a>
+          </aside>
+          <main class="main-content">
+            <div class="page-header">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h2>Security Center</h2>
+                  <p>Monitor and improve your account security</p>
+                </div>
+                <span class="badge badge-medium">Case #IB-2024-8821 · Under Review</span>
+              </div>
+            </div>
+
+            <!-- Positive Progress Banner -->
+            <div class="banner banner-info" style="animation:dropIn 0.4s ease; border-color:#2ca01c; background:#f0faf0;">
+              <div class="banner-icon">🎉</div>
+              <div class="banner-body">
+                <div class="banner-title" style="color:#2ca01c;">Your account is more secure. Keep going!</div>
+                <div class="banner-text">Great job completing 3 key security steps. You've improved your Security Score by <strong>+33 points</strong>. Complete one more action to reach a High security level.</div>
+              </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="three-col mb-16">
+              <div class="stat-mini">
+                <div class="stat-mini-num" style="color:#e65c00;">78</div>
+                <div class="stat-mini-label">Security Score</div>
+              </div>
+              <div class="stat-mini">
+                <div class="stat-mini-num text-green">1</div>
+                <div class="stat-mini-label">Issue Remaining</div>
+              </div>
+              <div class="stat-mini">
+                <div class="stat-mini-num text-blue">#IB-8821</div>
+                <div class="stat-mini-label">Case Under Review</div>
+              </div>
+            </div>
+
+            <div class="two-col">
+              <div>
+                <!-- Security Score Card — Improved -->
+                <div class="card">
+                  <div class="flex items-center justify-between mb-16">
+                    <div>
+                      <div class="card-title">Account Security Score</div>
+                      <div class="card-subtitle">Updated just now · ↑ +33 from last session</div>
+                    </div>
+                    <span class="badge badge-medium">Medium</span>
+                  </div>
+                  <div class="score-ring-wrap">
+                    <div class="score-ring">
+                      <svg viewBox="0 0 90 90">
+                        <circle cx="45" cy="45" r="38" fill="none" stroke="#f0f0f0" stroke-width="8"/>
+                        <circle cx="45" cy="45" r="38" fill="none" stroke="#F5A623" stroke-width="8"
+                          stroke-dasharray="238.76" stroke-dashoffset="52.5" stroke-linecap="round"/>
+                      </svg>
+                      <div class="score-ring-text">
+                        <span class="score-number text-orange">78</span>
+                        <span class="score-total">/100</span>
+                      </div>
+                    </div>
+                    <div class="score-info">
+                      <div class="score-level text-orange">Medium — Good Progress!</div>
+                      <div class="score-desc">You're almost there. Review connected apps to reach High security level and score 85+.</div>
+                      <div class="flex gap-8 mt-12 items-center">
+                        <div style="background:#f0f0f0; border-radius:4px; padding:4px 8px; font-size:12px; color:#6b6b6b;">
+                          Was <strong style="color:#D0021B;">45</strong>
+                        </div>
+                        <span style="font-size:18px; color:#2ca01c;">→</span>
+                        <div style="background:#e8f4fb; border-radius:4px; padding:4px 8px; font-size:12px; color:#0077C5;">
+                          Now <strong>78</strong>
+                        </div>
+                        <div style="background:#e6f9e6; border-radius:4px; padding:4px 8px; font-size:12px; color:#2ca01c;">
+                          Goal <strong>90+</strong>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Updated Checklist -->
+                <div class="card">
+                  <div class="card-title">Security Checklist</div>
+                  <div class="card-subtitle">3 completed · 1 remaining</div>
+                  <ul class="checklist">
+                    <li class="checklist-item">
+                      <div class="check-icon check-done">✓</div>
+                      <div>
+                        <div class="check-label" style="color:#2ca01c;">Password reset</div>
+                        <div class="check-detail">Completed April 3, 2026 · Strong password set</div>
+                      </div>
+                      <span class="badge badge-secure" style="font-size:10px; flex-shrink:0; margin-left:auto;">Done</span>
+                    </li>
+                    <li class="checklist-item">
+                      <div class="check-icon check-done">✓</div>
+                      <div>
+                        <div class="check-label" style="color:#2ca01c;">2-Step Verification enabled</div>
+                        <div class="check-detail">SMS verification active · Backup codes saved</div>
+                      </div>
+                      <span class="badge badge-secure" style="font-size:10px; flex-shrink:0; margin-left:auto;">Done</span>
+                    </li>
+                    <li class="checklist-item">
+                      <div class="check-icon check-done">✓</div>
+                      <div>
+                        <div class="check-label" style="color:#2ca01c;">Suspicious activity reported</div>
+                        <div class="check-detail">Case #IB-2024-8821 · Under review by security team</div>
+                      </div>
+                      <span class="badge badge-secure" style="font-size:10px; flex-shrink:0; margin-left:auto;">Done</span>
+                    </li>
+                    <li class="checklist-item" style="background:#FFF8E7; margin:-10px -24px; padding:10px 24px; border-radius:0;">
+                      <div class="check-icon check-warn">!</div>
+                      <div>
+                        <div class="check-label">Review connected apps</div>
+                        <div class="check-detail">2 apps connected · Verify none were added without your permission</div>
+                        <div class="check-action mt-4">
+                          <button class="btn btn-primary btn-sm">Review Now · +12 pts</button>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Right Column -->
+              <div>
+                <!-- Case Status -->
+                <div class="card mb-16" style="border-left:4px solid #0077C5;">
+                  <div class="text-xs text-muted mb-4">OPEN INVESTIGATION</div>
+                  <div class="font-bold mb-4">Case #IB-2024-8821</div>
+                  <div class="text-sm text-muted mb-12">Our security team is reviewing your report. You'll receive an email update within 2 business hours.</div>
+                  <div style="display:flex; justify-content:space-between; font-size:12px;">
+                    <div>
+                      <div class="text-muted">Submitted</div>
+                      <div class="font-bold">Apr 3 · 9:14 AM</div>
+                    </div>
+                    <div>
+                      <div class="text-muted">Expected response</div>
+                      <div class="font-bold text-green">By 11:14 AM</div>
+                    </div>
+                    <div>
+                      <div class="text-muted">Status</div>
+                      <div class="font-bold text-blue">In Review</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Connected Apps to Review -->
+                <div class="card mb-16">
+                  <div class="card-title">Connected Apps</div>
+                  <div class="card-subtitle">Review for unauthorized access</div>
+                  <div class="app-row">
+                    <div class="app-icon" style="background:#e8f4fb;">📊</div>
+                    <div class="app-info">
+                      <div class="app-name">QuickBooks Online</div>
+                      <div class="app-detail">Connected March 2024 · You</div>
+                    </div>
+                    <span class="badge badge-secure" style="font-size:10px;">Verified</span>
+                  </div>
+                  <div class="app-row">
+                    <div class="app-icon" style="background:#FFF8E7;">❓</div>
+                    <div class="app-info">
+                      <div class="app-name">DataSync Pro</div>
+                      <div class="app-detail">Connected Apr 2 · Unverified</div>
+                    </div>
+                    <button class="btn btn-danger btn-sm">Review</button>
+                  </div>
+                </div>
+
+                <!-- Proactive Tip for next goal -->
+                <div class="card" style="background:linear-gradient(135deg, #f0f7ff, #e8f4fb); border-color:#c0dff5;">
+                  <div class="flex gap-8 items-start">
+                    <div style="font-size:20px;">🎯</div>
+                    <div>
+                      <div class="card-title text-blue mb-4">Almost at High Security!</div>
+                      <div class="text-sm" style="color:#2d2d2d; line-height:1.5; margin-bottom:10px;">
+                        Review your connected apps to gain <strong>+12 points</strong> and reach <strong>score 90</strong> — High security level.
+                      </div>
+                      <button class="btn btn-primary btn-sm">Complete Last Step →</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════════════════
+       FIGMA SPEC SECTION
+  ══════════════════════════════════════════════════════════════════════ -->
+  <section class="figma-spec" id="figma-spec">
+    <h2>Figma Spec</h2>
+    <p class="spec-subtitle">CAS — Customer Self-Reporting & Self-Remediation Flow · Intuit Security Center</p>
+
+    <div class="spec-divider"></div>
+
+    <h3>Feature Overview</h3>
+    <p>
+      The CAS (Customer Account Security) Self-Reporting & Self-Remediation flow empowers Intuit customers to independently report suspicious account activity and account takeovers (ATOs) without needing to call customer support. The feature integrates an AI-powered Intuit Assist chatbot into Security Center to guide users through a structured questionnaire, automated risk assessment, guided remediation steps, and escalation to a human investigation team when needed.
+    </p>
+    <p>
+      <strong>Business motivation:</strong> Support calls for suspicious activity reports are restricted to M–F 6am–6pm PST, leaving users exposed outside of those hours. This self-service flow provides 24/7 coverage, reduces support volume, and improves customer trust through transparency and immediate action.
+    </p>
+
+    <div class="spec-divider"></div>
+
+    <h3>Screen Inventory</h3>
+    <div class="spec-screen-grid">
+      <div class="spec-screen-card">
+        <div class="spec-screen-number">Screen 1</div>
+        <div class="spec-screen-title">Security Center Overview</div>
+        <div class="spec-screen-desc">Entry point. Shows Account Security Score (45/100 · Critical), critical banner for detected suspicious activity, security checklist with incomplete items, and prominent "Report Suspicious Activity" CTA. Recent activity log surfaces suspicious login from Chicago, IL and an unfamiliar QuickBooks transaction.</div>
+      </div>
+      <div class="spec-screen-card">
+        <div class="spec-screen-number">Screen 2</div>
+        <div class="spec-screen-title">Intuit Assist: Questionnaire</div>
+        <div class="spec-screen-desc">Intuit Assist chatbot panel slides in from right. Bot greets empathetically and presents a multi-select questionnaire: Unrecognized login attempt, Unfamiliar transaction, Changes to personal info, Unrecognized connected app. User has pre-selected the first two. Continue button active.</div>
+      </div>
+      <div class="spec-screen-card">
+        <div class="spec-screen-number">Screen 3</div>
+        <div class="spec-screen-title">Risk Assessment Result</div>
+        <div class="spec-screen-desc">Bot summarizes responses and displays Account Security Level: HIGH RISK in a red callout. Two action path cards: "Secure my account now" (recommended, hovered state shown) and "Report to investigation team." Back button available.</div>
+      </div>
+      <div class="spec-screen-card">
+        <div class="spec-screen-number">Screen 4</div>
+        <div class="spec-screen-title">Self-Remediation Checklist</div>
+        <div class="spec-screen-desc">Guided 3-step remediation. Step 1 (Reset Password) is active and expanded with password input fields, strength indicator, and requirements checklist. Steps 2 (MFA) and 3 (Review Activity) are pending/dimmed. Progress bar shows 1/3 complete. Intuit Assist sidebar provides contextual tips.</div>
+      </div>
+      <div class="spec-screen-card">
+        <div class="spec-screen-number">Screen 5</div>
+        <div class="spec-screen-title">ATO Escalation: Report Submitted</div>
+        <div class="spec-screen-desc">Success state after user submits report to investigation team. Case #IB-2024-8821 confirmed. Summary of collected info (date noticed, suspicious activity type, location). List of automatic actions taken. Recommended next steps with priority ordering. Intuit Assist panel remains visible with follow-up guidance.</div>
+      </div>
+      <div class="spec-screen-card">
+        <div class="spec-screen-number">Screen 6</div>
+        <div class="spec-screen-title">Post-Remediation Security Center</div>
+        <div class="spec-screen-desc">Security Center in improved state. Score updated to 78/100 (Medium). Celebratory progress banner. Checklist shows 3 completed items (Password ✓, MFA ✓, Case Reported ✓) and 1 remaining action (Review connected apps). Open case status widget. Connected apps card flags one unverified app.</div>
+      </div>
+    </div>
+
+    <div class="spec-divider"></div>
+
+    <h3>User Flow</h3>
+    <ol>
+      <li>User lands on Security Center — sees Security Score (45 Critical), suspicious activity banner, and incomplete security checklist</li>
+      <li>User clicks "Report Suspicious Activity" button — Intuit Assist chatbot panel opens (Screen 2)</li>
+      <li>Bot greets user empathetically and presents multi-select questionnaire about suspicious activity types</li>
+      <li>User selects applicable items and clicks Continue</li>
+      <li>Bot analyzes responses and presents risk level (HIGH RISK in this flow) with two action paths (Screen 3)</li>
+      <li><strong>Path A (Self-Remediation):</strong> User selects "Secure my account now" → Screen 4: Guided 3-step checklist (Password reset → MFA setup → Activity review)</li>
+      <li><strong>Path B (Escalation):</strong> User selects "Report to investigation team" → Screen 5: Form collects incident details → Case #IB-XXXX opened → Success confirmation</li>
+      <li>Both paths converge to Screen 6: Post-remediation Security Center with updated score, completed checklist items, and remaining action prompt</li>
+    </ol>
+
+    <div class="spec-divider"></div>
+
+    <h3>Components Used</h3>
+    <p>
+      <span class="component-pill">TopNav (52px)</span>
+      <span class="component-pill">Sidebar (200px)</span>
+      <span class="component-pill">SecurityScoreRing</span>
+      <span class="component-pill">BannerCritical</span>
+      <span class="component-pill">BannerWarning</span>
+      <span class="component-pill">BannerSuccess</span>
+      <span class="component-pill">BannerInfo</span>
+      <span class="component-pill">SecurityChecklist</span>
+      <span class="component-pill">IntuitAssistPanel</span>
+      <span class="component-pill">ChatBubble (Bot)</span>
+      <span class="component-pill">ChatBubble (User)</span>
+      <span class="component-pill">CheckboxOption</span>
+      <span class="component-pill">ActionPathCard</span>
+      <span class="component-pill">ProgressBar</span>
+      <span class="component-pill">StepChecklist</span>
+      <span class="component-pill">PasswordInput</span>
+      <span class="component-pill">PasswordStrengthBar</span>
+      <span class="component-pill">CaseNumberDisplay</span>
+      <span class="component-pill">NextStepsList</span>
+      <span class="component-pill">ConnectedAppRow</span>
+      <span class="component-pill">StatMiniCard</span>
+      <span class="component-pill">btn-primary</span>
+      <span class="component-pill">btn-secondary</span>
+      <span class="component-pill">btn-danger</span>
+      <span class="component-pill">btn-dismiss</span>
+      <span class="component-pill">badge-action-needed</span>
+      <span class="component-pill">badge-restricted</span>
+      <span class="component-pill">badge-secure</span>
+      <span class="component-pill">badge-medium</span>
+      <span class="component-pill">badge-high</span>
+      <span class="component-pill">badge-info</span>
+    </p>
+
+    <div class="spec-divider"></div>
+
+    <h3>Color Tokens</h3>
+    <table class="color-table">
+      <thead>
+        <tr>
+          <th>Token Name</th>
+          <th>Hex Value</th>
+          <th>Usage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="color-swatch" style="background:#0077C5;"></span>Primary Blue</td><td>#0077C5</td><td>Primary buttons, active sidebar, links, chatbot header, badge-info</td></tr>
+        <tr><td><span class="color-swatch" style="background:#2ca01c;"></span>Accent Green</td><td>#2ca01c</td><td>Logo last "t", badge-secure, check-done icons, success banners, positive scores</td></tr>
+        <tr><td><span class="color-swatch" style="background:#D0021B;"></span>Critical Red</td><td>#D0021B</td><td>btn-danger, badge-restricted, critical banners, critical score, check-fail icons</td></tr>
+        <tr><td><span class="color-swatch" style="background:#FEF0F0;"></span>Critical Red BG</td><td>#FEF0F0</td><td>Critical banner background, critical risk card background</td></tr>
+        <tr><td><span class="color-swatch" style="background:#F5A623;"></span>Warning Yellow</td><td>#F5A623</td><td>Warning banner border, badge-action-needed border, check-warn icons</td></tr>
+        <tr><td><span class="color-swatch" style="background:#FFF8E7;"></span>Warning Yellow BG</td><td>#FFF8E7</td><td>Warning banner background, badge-action-needed background</td></tr>
+        <tr><td><span class="color-swatch" style="background:#e65c00;"></span>Medium Orange</td><td>#e65c00</td><td>Medium risk score text, badge-medium text</td></tr>
+        <tr><td><span class="color-swatch" style="background:#2d2d2d;"></span>Text Primary</td><td>#2d2d2d</td><td>Body text, headings, labels</td></tr>
+        <tr><td><span class="color-swatch" style="background:#6b6b6b;"></span>Text Muted</td><td>#6b6b6b</td><td>Subtext, descriptions, placeholders, timestamps</td></tr>
+        <tr><td><span class="color-swatch" style="background:#f4f4f6;"></span>Page Background</td><td>#f4f4f6</td><td>Outer page background</td></tr>
+        <tr><td><span class="color-swatch" style="background:#fafafa;"></span>Content Background</td><td>#fafafa</td><td>Main content area background</td></tr>
+        <tr><td><span class="color-swatch" style="background:#ffffff; border:1px solid #ccc;"></span>Cards / Nav</td><td>#ffffff</td><td>Card backgrounds, top nav, sidebar</td></tr>
+        <tr><td><span class="color-swatch" style="background:#e5e5e5;"></span>Border</td><td>#e5e5e5</td><td>Card borders, nav bottom border, sidebar right border, dividers</td></tr>
+        <tr><td><span class="color-swatch" style="background:#e8f4fb;"></span>Blue Light</td><td>#e8f4fb</td><td>Sidebar active background, badge-info background, info highlights</td></tr>
+      </tbody>
+    </table>
+
+    <div class="spec-divider"></div>
+
+    <h3>Key Copy / Microcopy Strings</h3>
+
+    <h4>Banners</h4>
+    <div class="copy-string">
+      <div class="copy-key">Critical Banner Title</div>
+      <div class="copy-val">"We've detected suspicious activity on your account"</div>
+    </div>
+    <div class="copy-string">
+      <div class="copy-key">Critical Banner Body</div>
+      <div class="copy-val">"An unrecognized login attempt was made from Chicago, IL on [date] at [time]. Your account may be at risk."</div>
+    </div>
+    <div class="copy-string">
+      <div class="copy-key">Success Banner Title</div>
+      <div class="copy-val">"Your report has been submitted successfully"</div>
+    </div>
+    <div class="copy-string">
+      <div class="copy-key">Post-Remediation Banner</div>
+      <div class="copy-val">"Your account is more secure. Keep going to reach a High security level."</div>
+    </div>
+
+    <h4>Intuit Assist Chatbot</h4>
+    <div class="copy-string">
+      <div class="copy-key">Bot Greeting</div>
+      <div class="copy-val">"Hi [Name], I'm here to help keep your account safe. I noticed some unusual activity on your account. Let's figure out what happened together — this will only take a few minutes."</div>
+    </div>
+    <div class="copy-string">
+      <div class="copy-key">Questionnaire Prompt</div>
+      <div class="copy-val">"Have you noticed any of the following? (Select all that apply)"</div>
+    </div>
+    <div class="copy-string">
+      <div class="copy-key">Risk Assessment — High</div>
+      <div class="copy-val">"Based on what you've shared, your account may have been accessed without your permission. I'll help you secure it right now."</div>
+    </div>
+    <div class="copy-string">
+      <div class="copy-key">Bot — Post-Escalation</div>
+      <div class="copy-val">"Your report is in good hands, [Name]. Our security team will review your case within 2 business hours."</div>
+    </div>
+    <div class="copy-string">
+      <div class="copy-key">Remediation Encouragement</div>
+      <div class="copy-val">"You're doing great. Let's secure your account step by step."</div>
+    </div>
+    <div class="copy-string">
+      <div class="copy-key">Footer Trust Signal</div>
+      <div class="copy-val">"Your responses are encrypted and secure"</div>
+    </div>
+
+    <h4>Security Score Labels</h4>
+    <div class="copy-string">
+      <div class="copy-key">Critical (0–49)</div>
+      <div class="copy-val">"Critical — Immediate Action Required"</div>
+    </div>
+    <div class="copy-string">
+      <div class="copy-key">Medium (50–79)</div>
+      <div class="copy-val">"Medium — Good Progress!"</div>
+    </div>
+    <div class="copy-string">
+      <div class="copy-key">High (80–94)</div>
+      <div class="copy-val">"High — Well Protected"</div>
+    </div>
+    <div class="copy-string">
+      <div class="copy-key">Secure (95–100)</div>
+      <div class="copy-val">"Secure — Excellent"</div>
+    </div>
+
+    <div class="spec-divider"></div>
+
+    <h3>Interaction Notes</h3>
+    <ul>
+      <li><strong>Chatbot entry:</strong> Panel slides in from right using <code>slideInRight</code> animation (0.3s ease). Background content dims to rgba(0,0,0,0.1) to focus attention.</li>
+      <li><strong>Questionnaire checkboxes:</strong> Toggle <code>.checked</code> class on label click. Label border turns blue, background turns #e8f4fb, check box fills blue with checkmark. "Continue" button is disabled until at least one option is selected.</li>
+      <li><strong>Action path cards (Screen 3):</strong> Hover state adds blue border, blue box-shadow, slight translateY(-1px) lift. Hovered state shown statically in prototype to indicate default selection.</li>
+      <li><strong>Risk level display (Screen 3):</strong> Computed server-side based on questionnaire responses. Score thresholds: 2+ high-impact options = HIGH, 1 high-impact = MEDIUM, informational only = LOW.</li>
+      <li><strong>Progress bar (Screen 4):</strong> Animates width on step completion. Each step completion triggers score recalculation and updates the sidebar Security Score indicator.</li>
+      <li><strong>Password strength indicator:</strong> Real-time evaluation of input value. 4-bar visual: 1 bar = Weak (red), 2 bars = Fair (yellow), 3 bars = Strong (green), 4 bars = Very Strong (green).</li>
+      <li><strong>Security Score ring:</strong> SVG circle with stroke-dasharray/dashoffset calculation. Formula: dashoffset = circumference × (1 − score/100). Circumference = 2π × r = 238.76 for r=38.</li>
+      <li><strong>Post-remediation score animation:</strong> On Screen 6 load, animate score ring from previous value (45) to new value (78) over 1.2s with easing.</li>
+      <li><strong>Banners:</strong> × button hides banner with fade + slideUp animation. Dismissed state persists in localStorage for the session.</li>
+      <li><strong>Case number format:</strong> #IB-[YYYY]-[4-digit-id]. Monospace font. Auto-copied to clipboard on click with tooltip confirmation.</li>
+      <li><strong>Connected apps unverified state:</strong> Unverified apps shown with warning icon and yellow background. "Review" button triggers modal with app details and remove option.</li>
+      <li><strong>Accessibility:</strong> All interactive elements have focus-visible outlines. Color is not the sole indicator of status (icons/labels accompany all color-coded states). ARIA labels on icon-only buttons.</li>
+      <li><strong>Responsive breakpoints:</strong> Below 900px, sidebar collapses to icons only. Below 700px, main layout stacks vertically. Chat panel becomes full-width bottom sheet on mobile.</li>
+    </ul>
+
+    <div class="spec-divider"></div>
+
+    <h3>Security Score Calculation Model</h3>
+    <table class="color-table">
+      <thead>
+        <tr><th>Factor</th><th>Max Points</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Password strength & recency</td><td>20 pts</td><td>Strong + changed within 90 days = full points</td></tr>
+        <tr><td>2-Step Verification enabled</td><td>25 pts</td><td>Binary: enabled or not</td></tr>
+        <tr><td>Recovery email verified</td><td>10 pts</td><td>Binary: verified or not</td></tr>
+        <tr><td>No active suspicious sessions</td><td>20 pts</td><td>Deducted when suspicious login detected</td></tr>
+        <tr><td>Connected apps reviewed</td><td>15 pts</td><td>All apps verified by user</td></tr>
+        <tr><td>No open security incidents</td><td>10 pts</td><td>Deducted while investigation case is open</td></tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top:24px; font-size:12px; color:#6c7086;">
+      CAS Self-Reporting & Self-Remediation · Intuit Security Center · Prototype v1.0 · April 2026
+    </div>
+  </section>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════════════════════════════════ -->
+<script>
+  // ── Screen Navigation ────────────────────────────────────────────────────
+  function scrollToScreen(n) {
+    const el = document.getElementById('screen' + n);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Update tab active state
+      document.querySelectorAll('.screen-tab').forEach((tab, i) => {
+        tab.classList.toggle('active', i === n - 1);
+      });
+    }
+  }
+
+  // ── Checkbox Toggle (Screen 2 chatbot options) ───────────────────────────
+  function toggleCheck(label) {
+    label.classList.toggle('checked');
+    const box = label.querySelector('.chat-check-box');
+    if (label.classList.contains('checked')) {
+      box.textContent = '✓';
+    } else {
+      box.textContent = '';
+    }
+  }
+
+  // ── Intersection Observer for tab highlighting ───────────────────────────
+  const screens = [1,2,3,4,5,6];
+  const tabs = document.querySelectorAll('.screen-tab');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
+        const id = entry.target.id;
+        const n = parseInt(id.replace('screen','')) - 1;
+        tabs.forEach((t, i) => t.classList.toggle('active', i === n));
+      }
+    });
+  }, { threshold: 0.3 });
+
+  screens.forEach(n => {
+    const el = document.getElementById('screen' + n);
+    if (el) observer.observe(el);
+  });
+
+  // ── Password field interaction (Screen 4) ──────────────────────────────
+  // Simulate real-time strength for demo purposes
+  document.querySelectorAll('.form-input[type="password"]').forEach(input => {
+    input.addEventListener('focus', function() {
+      this.type = 'password'; // keep masked
+    });
+  });
+
+  // ── Action path hover animation (Screen 3) ─────────────────────────────
+  document.querySelectorAll('.action-path-card').forEach(card => {
+    card.addEventListener('mouseenter', () => card.classList.add('hovered'));
+    card.addEventListener('mouseleave', () => {
+      // Only remove if not the statically hovered one in Screen 3
+      if (!card.closest('#screen3')) card.classList.remove('hovered');
+    });
+    card.addEventListener('click', () => {
+      // ripple feedback
+      card.style.transform = 'scale(0.98)';
+      setTimeout(() => card.style.transform = '', 150);
+    });
+  });
+
+  // ── Banner dismiss ─────────────────────────────────────────────────────
+  document.querySelectorAll('.banner-dismiss').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const banner = this.closest('.banner');
+      if (banner) {
+        banner.style.transition = 'opacity 0.2s, max-height 0.3s';
+        banner.style.opacity = '0';
+        banner.style.maxHeight = '0';
+        banner.style.overflow = 'hidden';
+        setTimeout(() => banner.style.display = 'none', 300);
+      }
+    });
+  });
+
+  // ── Sidebar nav (visual feedback only) ────────────────────────────────
+  document.querySelectorAll('.sidebar-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      const sidebar = this.closest('.sidebar');
+      sidebar.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // ── Case number copy ────────────────────────────────────────────────────
+  document.querySelectorAll('.case-number').forEach(el => {
+    el.style.cursor = 'pointer';
+    el.title = 'Click to copy';
+    el.addEventListener('click', function() {
+      const text = this.textContent;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          const orig = this.textContent;
+          this.textContent = '✓ Copied!';
+          this.style.color = '#2ca01c';
+          setTimeout(() => {
+            this.textContent = orig;
+            this.style.color = '#0077C5';
+          }, 1500);
+        });
+      }
+    });
+  });
+
+  // ── Progress bar animate on scroll ─────────────────────────────────────
+  const progressFill = document.querySelector('.progress-bar-fill');
+  if (progressFill) {
+    const progressObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          progressFill.style.width = '0%';
+          requestAnimationFrame(() => {
+            setTimeout(() => {
+              progressFill.style.width = '33.3%';
+            }, 100);
+          });
+        }
+      });
+    }, { threshold: 0.5 });
+    progressObserver.observe(progressFill);
+  }
+
+  console.log('%c CAS Self-Reporting Prototype', 'font-size:16px; font-weight:bold; color:#0077C5;');
+  console.log('%c Intuit Security Center · 6 Screens · v1.0', 'color:#6b6b6b;');
+</script>
+</body>
+</html>
