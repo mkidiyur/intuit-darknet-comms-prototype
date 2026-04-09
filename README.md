@@ -21,6 +21,22 @@ This repo includes a [Cursor Agent Skill](https://docs.cursor.com) that generate
 
 Copy the folder `.cursor/skills/create_prototype/` into that project’s `.cursor/skills/` directory, or copy `SKILL.md` to `~/.cursor/skills/create_prototype/SKILL.md` for a personal skill available in all your projects.
 
+### If it “doesn’t run” for your coworker
+
+1. **`git pull origin main`** so they have `.cursor/skills/` and `.cursor/rules/create-prototype.mdc`.
+2. **Open the repo root** in Cursor (**File → Open Folder** → the folder that contains `.cursor/`, not a parent directory).
+3. Use **Agent** chat (agent mode), not only inline Ask, if they are generating files.
+4. **Update Cursor** to the latest version; Agent Skills need a current build.
+5. In chat, try explicitly: **“Read `.cursor/skills/create_prototype/SKILL.md` and follow it. Feature name: `…`. PRD: …”**  
+   A project rule also nudges the agent toward that file, but naming the path removes ambiguity.
+6. **Personal copy (works in any repo):**  
+   `mkdir -p ~/.cursor/skills/create_prototype && cp .cursor/skills/create_prototype/SKILL.md ~/.cursor/skills/create_prototype/`  
+   Then restart Cursor. They can still say “follow create_prototype” in other workspaces.
+
+### Optional: attach the Skill in UI
+
+In Agent chat, open the **@** menu and look for **Skills** (or your Cursor version’s equivalent). If `create_prototype` appears, attach it. Names and menus vary by version; the rule + explicit file path above still work without that.
+
 ## License
 
 Add a license if you intend open-source use.

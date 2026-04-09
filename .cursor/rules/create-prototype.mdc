@@ -1,0 +1,16 @@
+---
+description: >-
+  Intuit Security Center HTML prototypes. Applies when the user runs create_prototype,
+  /create_prototype, asks for a mockup, screen flow, or Figma-spec HTML prototype.
+alwaysApply: true
+---
+
+# create_prototype (project)
+
+When the user wants an **Intuit Security Center** style HTML prototype—including `/create_prototype`, “create prototype”, “build the mockup”, or similar:
+
+1. **Read** `.cursor/skills/create_prototype/SKILL.md` from this repo and follow it for layout, tokens, components, and the Figma spec section.
+2. If they did not provide a **feature name** (kebab-case file) and **PRD / requirements** inline, **ask** for both before generating files.
+3. Write a single self-contained **`<feature-name>-prototype.html`** at the **repository root** (no external assets).
+
+This backs up the Agent Skill in `.cursor/skills/` if Skills are not attached or not discovered.
